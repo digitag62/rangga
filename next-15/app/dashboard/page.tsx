@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 const DashboardPage = async () => {
   const session = await auth();
-
+  
   return (
     <div className="min-h-screen flex justify-center items-center">
       <div className="flex flex-col items-center justify-center gap-2">

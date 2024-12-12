@@ -28,7 +28,6 @@ export const createUser = async (payload: RegisterProps) => {
 export const authenticate = async (payload: LoginProps) => {
   try {
     const res = await signIn("credentials", { ...payload, redirect: false });
-    console.log("res:", res);
     return { success: true, message: `Welcome ${payload.email}` };
   } catch (error) {
     if (error instanceof AuthError) {
