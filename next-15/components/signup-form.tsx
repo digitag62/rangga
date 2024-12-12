@@ -5,6 +5,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 import { createUser } from "@/lib/actions";
 import {
@@ -42,6 +43,7 @@ const formSchema = z
 export function SignUpForm() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
@@ -67,6 +69,7 @@ export function SignUpForm() {
       });
 
       setIsLoading(false);
+      router.push("/sign-in");
     } else {
       toast({
         title: "Sign Up Failed!",

@@ -1,22 +1,25 @@
 "use client";
 
-import Link from "next/link";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
+
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { authenticate } from "@/lib/actions";
 
 const formSchema = z.object({
   email: z
@@ -27,6 +30,10 @@ const formSchema = z.object({
 });
 
 export function SignInForm() {
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  const router = useRouter();
+
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -37,9 +44,27 @@ export function SignInForm() {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
-    console.log(values);
+    setIsLoading(true);
+    const res = await authenticate(values);
+
+    if (res.success) {
+      toast({
+        title: "Signed In!",
+        description: res.message,
+      });
+      setIsLoading(false);
+
+      router.push("/dashboard");
+    } else {
+      toast({
+        title: "Sign Up Failed!",
+        description: res.message,
+      });
+      setIsLoading(false);
+      form.reset();
+    }
   }
 
   return (
@@ -53,7 +78,7 @@ export function SignInForm() {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="m@example.com" {...field} />
+                  <Input type="email" placeholder="m@example.com" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -74,7 +99,7 @@ export function SignInForm() {
                   </Link>
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="*******" {...field} />
+                  <Input type="password" placeholder="*******" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
