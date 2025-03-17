@@ -119,24 +119,28 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       },
       {
         title: "Settings",
-        url: "#",
+        url: "/dashboard/settings",
         icon: Settings2,
         items: [
           {
             title: "General",
-            url: "#",
+            url: "/dashboard/settings",
           },
           {
             title: "Team",
-            url: "#",
+            url: "/dashboard/settings/team",
           },
           {
             title: "Billing",
-            url: "#",
+            url: "/dashboard/settings/billing",
           },
           {
             title: "Limits",
-            url: "#",
+            url: "/dashboard/settings/limit",
+          },
+          {
+            title: "Navigation",
+            url: "/dashboard/settings/nav",
           },
         ],
       },
