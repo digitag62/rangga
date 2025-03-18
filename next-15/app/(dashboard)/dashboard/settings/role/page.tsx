@@ -1,12 +1,21 @@
 import React from "react";
-import Link from "next/link";
+import prismadb from "@/lib/prisma";
 
-const RolePage = () => {
+import { DataTable } from "./data-table";
+import { columns } from "./columns";
+
+const RolePage = async () => {
+  const data = await prismadb.role.findMany();
+
   return (
     <div className="min-h-screen flex justify-center items-center">
-      <div className="flex flex-col items-center justify-center gap-2">
-        <h1 className="text-xl">Role settings</h1>
-        <Link href="/dashboard/settings/role/create">Create Role</Link>
+      <div className="p-12 space-y-6 w-full gap-2">
+        <h1 className="text-xl">Role Settings</h1>
+        <DataTable
+          columns={columns}
+          data={data}
+          url="/dashboard/settings/role/create"
+        />
       </div>
     </div>
   );

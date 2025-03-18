@@ -30,3 +30,12 @@ export type RolePayloadProps = {
   role: string;
   email: string;
 };
+
+export type RoleProps = {
+  id: string;
+  role: string;
+  createdAt: Date;
+  updatedAt: Date | null;
+  createdBy: string;
+  updatedBy: string | null;
+};
