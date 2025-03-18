@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "User" ALTER COLUMN "roleId" SET DEFAULT 'RtW6TXTs6ewuWfPYYw7x6zNIAekOiSiu6OPZwTjKuZg=';

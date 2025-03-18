@@ -5,7 +5,12 @@ import { signIn } from "@/auth";
 
 import prismadb from "@/lib/prisma";
 import { hashPassword } from "@/lib/helpers";
-import { LoginProps, RegisterProps } from "@/lib/types";
+import {
+  LoginProps,
+  NavGroupPayloadProps,
+  RegisterProps,
+  RolePayloadProps,
+} from "@/lib/types";
 
 export const createUser = async (payload: RegisterProps) => {
   const hashedPassword = await hashPassword(payload.password);
@@ -21,6 +26,7 @@ export const createUser = async (payload: RegisterProps) => {
 
     return { success: true, message: "Register User: Success" };
   } catch (error) {
+    console.log(error);
     return { success: false, message: "Register User: Failed" };
   }
 };
@@ -42,5 +48,39 @@ export const authenticate = async (payload: LoginProps) => {
       }
     }
     throw error;
+  }
+};
+
+export const createRole = async (payload: RolePayloadProps) => {
+  try {
+    await prismadb.role.create({
+      data: {
+        role: payload.role.toUpperCase(),
+        createdBy: payload.email,
+      },
+    });
+
+    return { success: true, message: "Create Role: Success" };
+  } catch (error) {
+    console.log(error);
+    return { success: false, message: "Create Role: Failed" };
+  }
+};
+
+export const createNavGroup = async (payload: NavGroupPayloadProps) => {
+  try {
+    await prismadb.navGroup.create({
+      data: {
+        title: payload.title,
+        url: payload.url,
+        icon: payload.icon,
+        createdBy: payload.email,
+      },
+    });
+
+    return { success: true, message: "Create Nav Group: Success" };
+  } catch (error) {
+    console.log(error);
+    return { success: false, message: "Create Nav Group: Failed" };
   }
 };

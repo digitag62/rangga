@@ -16,18 +16,62 @@ datasource db {
   // directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
+model Role {
+  id        String    @id @default(cuid())
+  role      String    @unique @db.VarChar(255)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  createdBy String
+  updatedBy String?
+  User      User[]
+  Access    Access[]
+}
+
 model User {
   id        String    @id @default(cuid())
   email     String    @unique @db.VarChar(255)
   pwd       String
-  role      Role      @default(USER)
+  role      Role?     @relation(fields: [roleId], references: [id])
+  roleId    String?   @default("cm8e6uxkm000388qaq1984jaw")
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
   createdBy String
   updatedBy String?
 }
 
-enum Role {
-  USER
-  ADMIN
+model Access {
+  id         String    @id @default(cuid())
+  role       Role?     @relation(fields: [roleId], references: [id])
+  roleId     String?
+  navGroup   NavGroup? @relation(fields: [navGroupId], references: [id])
+  navGroupId String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime? @updatedAt
+  createdBy  String
+  updatedBy  String?
+}
+
+model NavGroup {
+  id        String    @id @default(cuid())
+  title     String    @unique @db.VarChar(255)
+  url       String
+  icon      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  createdBy String
+  updatedBy String?
+  Navs      Nav[]
+  Access    Access[]
+}
+
+model Nav {
+  id         String    @id @default(cuid())
+  title      String    @unique @db.VarChar(255)
+  url        String
+  NavGroup   NavGroup? @relation(fields: [navGroupId], references: [id])
+  navGroupId String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime? @updatedAt
+  createdBy  String
+  updatedBy  String?
 }

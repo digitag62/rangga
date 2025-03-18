@@ -127,8 +127,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             url: "/dashboard/settings",
           },
           {
-            title: "Team",
-            url: "/dashboard/settings/team",
+            title: "Role",
+            url: "/dashboard/settings/role",
           },
           {
             title: "Billing",

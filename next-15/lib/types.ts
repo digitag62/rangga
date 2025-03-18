@@ -18,3 +18,15 @@ export type User = {
   createdBy: string;
   updatedBy: string | null;
 };
+
+export type NavGroupPayloadProps = {
+  title: string;
+  url: string;
+  icon: string;
+  email: string;
+};
+
+export type RolePayloadProps = {
+  role: string;
+  email: string;
+};
