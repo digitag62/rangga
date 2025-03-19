@@ -82,7 +82,11 @@ export const columns: ColumnDef<RoleProps>[] = [
               <Link href={`/dashboard/settings/role/${data.id}`}>Details</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Update role</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href={`/dashboard/settings/role/${data.id}/update`}>
+                Update role
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem>Delete role</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
