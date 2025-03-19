@@ -21,33 +21,34 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { useState } from "react";
+
+import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Eye } from "lucide-react";
+
+import { useState } from "react";
+import { PlusCircle } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { DataTablePagination } from "@/components/ui/datatable-pagination";
+import { DataTableViewOptions } from "@/components/ui/datatable-view-option";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  searchBy: string;
   url: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  searchBy,
   url,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
 
   const table = useReactTable({
     data,
@@ -59,31 +60,36 @@ export function DataTable<TData, TValue>({
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
+      rowSelection,
     },
   });
 
   return (
     <div>
-      <div className="flex items-center py-4">
+      <div className="flex items-center py-4 gap-2">
         <Input
-          placeholder="Search role..."
-          value={(table.getColumn("role")?.getFilterValue() as string) ?? ""}
+          placeholder="Search..."
+          value={(table.getColumn(searchBy)?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("role")?.setFilterValue(event.target.value)
+            table.getColumn(searchBy)?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
+        <DataTableViewOptions table={table} />
         <Link
           href={url}
-          className={cn(buttonVariants({ variant: "outline" }), "ml-auto")}
+          className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
         >
-          + New
+          <PlusCircle />
+          New
         </Link>
-        <DropdownMenu>
+
+        {/* <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon" className="ml-2">
               <Eye />
@@ -108,8 +114,9 @@ export function DataTable<TData, TValue>({
                 );
               })}
           </DropdownMenuContent>
-        </DropdownMenu>
+        </DropdownMenu> */}
       </div>
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -161,7 +168,9 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
       {/* Pagination */}
-      <div className="flex items-center justify-end space-x-2 py-4">
+      <DataTablePagination table={table} />
+
+      {/* <div className="flex items-center justify-end space-x-2 py-4">
         <Button
           variant="outline"
           size="sm"
@@ -178,7 +187,7 @@ export function DataTable<TData, TValue>({
         >
           Next
         </Button>
-      </div>
+      </div> */}
     </div>
   );
 }

@@ -1,8 +1,10 @@
 "use client";
 
-import { RoleProps } from "@/lib/types";
+import { NavLinkProps } from "@/lib/types";
 import { ColumnDef } from "@tanstack/react-table";
+import { MoreHorizontal } from "lucide-react";
 
+import { DataTableColumnHeader } from "@/components/ui/datatable-column-header";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,11 +15,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
-import { DataTableColumnHeader } from "@/components/ui/datatable-column-header";
-import Link from "next/link";
 
-export const columns: ColumnDef<RoleProps>[] = [
+export const columnsNavLink: ColumnDef<NavLinkProps>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -41,26 +40,26 @@ export const columns: ColumnDef<RoleProps>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "role",
+    accessorKey: "title",
     cell: ({ row }) => {
       const data = row.original;
 
-      return <p className="text-left pl-2">{data.role}</p>;
+      return <p className="text-left pl-2">{data.title}</p>;
     },
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Role" />
+      <DataTableColumnHeader column={column} title="Title" />
     ),
-    /*header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Role
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },*/
+  },
+  {
+    accessorKey: "url",
+    cell: ({ row }) => {
+      const data = row.original;
+
+      return <p className="text-left pl-2">{data.url}</p>;
+    },
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="URL" />
+    ),
   },
   {
     id: "actions",
@@ -78,8 +77,10 @@ export const columns: ColumnDef<RoleProps>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>
-              <Link href={`/dashboard/settings/role/${data.id}`}>Details</Link>
+            <DropdownMenuItem
+              onClick={() => navigator.clipboard.writeText(data.id)}
+            >
+              Copy ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Update role</DropdownMenuItem>
