@@ -10,8 +10,28 @@ import prismadb from "@/lib/prisma";
 
 async function getUser(email: string): Promise<User | null> {
   try {
-    const user = await prismadb.user.findUnique({ where: { email } });
-    return user;
+    const user = await prismadb.user.findUnique({
+      where: { email },
+      select: {
+        email: true,
+        pwd: true,
+        role: {
+          select: {
+            id: true,
+            role: true,
+          },
+        },
+      },
+    });
+
+    if (!user) return null;
+
+    return {
+      email: user?.email,
+      pwd: user?.pwd,
+      role: user?.role?.role,
+      roleId: user?.role?.id,
+    } as User;
   } catch (error) {
     console.error("Failed to fetch user:", error);
     throw new Error("Failed to fetch user.");

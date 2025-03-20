@@ -9,14 +9,10 @@ export type LoginProps = {
 };
 
 export type User = {
-  id: string;
   email: string;
   pwd: string;
   role: string;
-  createdAt: Date;
-  updatedAt: Date | null;
-  createdBy: string;
-  updatedBy: string | null;
+  roleId: string;
 };
 
 export type NavGroupPayloadProps = {

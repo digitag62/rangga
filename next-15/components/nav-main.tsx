@@ -20,8 +20,10 @@ import {
 import Link from "next/link";
 
 export function NavMain({
+  role,
   items,
 }: {
+  role: string;
   items: {
     title: string;
     url: string;
@@ -30,6 +32,7 @@ export function NavMain({
     items?: {
       title: string;
       url: string;
+      access: string[];
     }[];
   }[];
 }) {
@@ -54,15 +57,17 @@ export function NavMain({
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <SidebarMenuSub>
-                  {item.items?.map((subItem) => (
-                    <SidebarMenuSubItem key={subItem.title}>
-                      <SidebarMenuSubButton asChild>
-                        <Link href={subItem.url}>
-                          <span>{subItem.title}</span>
-                        </Link>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  ))}
+                  {item.items
+                    ?.filter((nav) => nav.access.includes(role))
+                    .map((subItem) => (
+                      <SidebarMenuSubItem key={subItem.title}>
+                        <SidebarMenuSubButton asChild>
+                          <Link href={subItem.url}>
+                            <span>{subItem.title}</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    ))}
                 </SidebarMenuSub>
               </CollapsibleContent>
             </SidebarMenuItem>
