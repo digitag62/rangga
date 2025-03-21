@@ -22,6 +22,14 @@ export type NavGroupPayloadProps = {
   email: string;
 };
 
+export type NavPayloadProps = {
+  group: string;
+  title: string;
+  url: string;
+  access: string[];
+  isActive: boolean;
+};
+
 export type RolePayloadProps = {
   role: string;
   email: string;

@@ -84,3 +84,21 @@ export const createNavGroup = async (payload: NavGroupPayloadProps) => {
     return { success: false, message: "Create Nav Group: Failed" };
   }
 };
+
+export const createNav = async (payload: NavGroupPayloadProps) => {
+  try {
+    await prismadb.navGroup.create({
+      data: {
+        title: payload.title,
+        url: payload.url,
+        icon: payload.icon,
+        createdBy: payload.email,
+      },
+    });
+
+    return { success: true, message: "Create Nav Group: Success" };
+  } catch (error) {
+    console.log(error);
+    return { success: false, message: "Create Nav Group: Failed" };
+  }
+};

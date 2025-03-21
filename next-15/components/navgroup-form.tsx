@@ -29,12 +29,27 @@ const formSchema = z.object({
   icon: z.string().min(1, { message: "This field has to be filled." }),
 });
 
-export function NavGroupForm() {
+export function NavGroupForm({
+  navId,
+  referal,
+}: {
+  navId: string | null;
+  referal: string | null;
+}) {
   const [isLoading, setIsLoading] = useState(false);
   const { data: session } = useSession();
 
   const { toast } = useToast();
   const router = useRouter();
+
+  let redirectPath = "";
+  if (referal === "create-nav") {
+    redirectPath = "/dashboard/settings/nav/create";
+  } else if (referal === "update-nav") {
+    redirectPath = `/dashboard/settings/nav/${navId}/update`;
+  } else {
+    redirectPath = "/dashboard/settings/nav-group";
+  }
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
@@ -61,7 +76,7 @@ export function NavGroupForm() {
       });
       setIsLoading(false);
 
-      router.push("/dashboard/settings/nav");
+      router.push(redirectPath);
     } else {
       toast({
         title: "Create Failed!",
@@ -124,7 +139,7 @@ export function NavGroupForm() {
             Submit
           </Button>
           <Link
-            href="/dashboard/settings/nav-group"
+            href={redirectPath}
             className={cn(buttonVariants({ variant: "outline" }))}
           >
             Back to Settings

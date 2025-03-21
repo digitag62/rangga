@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,13 +27,16 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { MultiSelect } from "@/components/ui/multi-select";
+import { authenticate, createNav } from "@/lib/actions";
+import { slugify } from "@/lib/helpers";
 
 const formSchema = z.object({
   title: z.string().min(1, { message: "This field has to be filled." }),
   url: z.string().min(1, { message: "This field has to be filled." }),
   group: z.string().min(1, { message: "This field has to be filled." }),
+  access: z.string().min(1, { message: "This field has to be filled." }),
+  isActive: z.string().min(1, { message: "This field has to be filled." }),
 });
 
 interface navFormProps {
@@ -47,8 +52,12 @@ interface navFormProps {
 
 export function NavForm({ navGroup, role }: navFormProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<string[]>([]);
+
   const { toast } = useToast();
   const router = useRouter();
+
+  const roleOptions = role.map((r) => ({ value: r.role, label: r.role }));
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
@@ -56,6 +65,7 @@ export function NavForm({ navGroup, role }: navFormProps) {
     defaultValues: {
       title: "",
       url: "",
+      isActive: "true",
     },
   });
 
@@ -63,30 +73,37 @@ export function NavForm({ navGroup, role }: navFormProps) {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     setIsLoading(true);
-    // const res = await authenticate(values);
+    const url = slugify(values.title);
+    const res = await createNav();
 
-    // if (res.success) {
-    //   toast({
-    //     title: "Created Successfully!",
-    //     description: res.message,
-    //   });
-    //   setIsLoading(false);
+    if (res.success) {
+      toast({
+        title: "Created Successfully!",
+        description: res.message,
+      });
+      setIsLoading(false);
 
-    //   router.push("/dashboard/settings/nav");
-    // } else {
-    //   toast({
-    //     title: "Create Failed!",
-    //     description: res.message,
-    //   });
-    //   setIsLoading(false);
-    //   form.reset();
-    // }
+      router.push("/dashboard/settings/nav");
+    } else {
+      toast({
+        title: "Create Failed!",
+        description: res.message,
+      });
+      setIsLoading(false);
+      form.reset();
+    }
   }
+
+  const handleGroupChange = (val: string) => {
+    const url = "/dashboard/settings/nav-group/create?ref=create-nav";
+    if (val === "new") redirect(url);
+  };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <div className="grid gap-4">
+          {/* navGroup */}
           <FormField
             control={form.control}
             name="group"
@@ -94,7 +111,10 @@ export function NavForm({ navGroup, role }: navFormProps) {
               <FormItem>
                 <FormLabel>NavGroup</FormLabel>
                 <Select
-                  onValueChange={field.onChange}
+                  onValueChange={(value) => {
+                    field.onChange(value);
+                    handleGroupChange(value);
+                  }}
                   defaultValue={field.value}
                 >
                   <FormControl>
@@ -103,8 +123,11 @@ export function NavForm({ navGroup, role }: navFormProps) {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
+                    <SelectItem value="new">New NavGroup</SelectItem>
                     {navGroup.map((nav) => (
-                      <SelectItem value={nav.id}>{nav.title}</SelectItem>
+                      <SelectItem key={nav.id} value={nav.id}>
+                        {nav.title}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -112,6 +135,7 @@ export function NavForm({ navGroup, role }: navFormProps) {
               </FormItem>
             )}
           />
+          {/* title */}
           <FormField
             control={form.control}
             name="title"
@@ -125,33 +149,65 @@ export function NavForm({ navGroup, role }: navFormProps) {
               </FormItem>
             )}
           />
+          {/* access */}
           <FormField
             control={form.control}
-            name="url"
+            name="access"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>URL</FormLabel>
+                <FormLabel>Access</FormLabel>
                 <FormControl>
-                  <Input
-                    type="text"
-                    placeholder="/dashboard/your/path"
-                    {...field}
+                  <MultiSelect
+                    options={roleOptions}
+                    onValueChange={setSelectedRole}
+                    defaultValue={selectedRole}
+                    placeholder="Select role"
+                    variant="inverted"
+                    animation={0}
+                    maxCount={3}
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+          {/* isActive */}
+          <FormField
+            control={form.control}
+            name="isActive"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Status</FormLabel>
 
-          <Button type="submit" className="w-full">
-            Login
-          </Button>
-          <Link
-            href="/dashboard/settings/nav"
-            className={cn(buttonVariants({ variant: "outline" }))}
-          >
-            Back to Settings
-          </Link>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a status" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="true">Active</SelectItem>
+                    <SelectItem value="false">Inactive</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="flex justify-center items-center gap-2 mt-2">
+            <Link
+              href="/dashboard/settings/nav"
+              className={cn(buttonVariants({ variant: "outline" }), "w-full")}
+            >
+              Cancel
+            </Link>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              Submit
+            </Button>
+          </div>
         </div>
       </form>
     </Form>
