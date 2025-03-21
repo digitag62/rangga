@@ -57,6 +57,11 @@ export const links = {
           url: "/dashboard/settings/nav-group",
           access: ["ADMIN"],
         },
+        {
+          title: "Nav",
+          url: "/dashboard/settings/nav",
+          access: ["ADMIN"],
+        },
       ],
     },
     /*{

@@ -62,3 +62,15 @@ export type NavGroupProps = {
   url: string;
   icon: string;
 };
+
+export type NavProps = {
+  NavGroup: {
+    title: string;
+    url: string;
+  };
+  id: string;
+  title: string;
+  url: string;
+  navGroupId: string;
+  access: string[];
+};

@@ -24,7 +24,6 @@ model Role {
   createdBy String
   updatedBy String?
   User      User[]
-  Access    Access[]
 }
 
 model User {
@@ -33,18 +32,6 @@ model User {
   pwd       String
   role      Role      @relation(fields: [roleId], references: [id])
   roleId    String    @default("cm8e6uxkm000388qaq1984jaw")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-  createdBy String
-  updatedBy String?
-}
-
-model Access {
-  id        String    @id @default(cuid())
-  role      Role      @relation(fields: [roleId], references: [id])
-  roleId    String
-  nav       Nav       @relation(fields: [navId], references: [id])
-  navId     String
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
   createdBy String
@@ -70,9 +57,9 @@ model Nav {
   isActive   Boolean   @default(true)
   NavGroup   NavGroup  @relation(fields: [navGroupId], references: [id])
   navGroupId String
+  access     String[]  @default(["USER", "ADMIN"])
   createdAt  DateTime  @default(now())
   updatedAt  DateTime? @updatedAt
   createdBy  String
   updatedBy  String?
-  Access     Access[]
 }
