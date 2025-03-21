@@ -57,3 +57,12 @@ export type NavLinkProps = {
   createdBy: string;
   updatedBy: string | null;
 };
+
+export type AllUserProps = {
+  role: {
+    role: string;
+    id: string;
+  } | null;
+  id: string;
+  email: string;
+};

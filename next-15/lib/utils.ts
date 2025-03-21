@@ -48,8 +48,8 @@ export const links = {
           access: ["ADMIN"],
         },
         {
-          title: "Navigation",
-          url: "/dashboard/settings/nav",
+          title: "User",
+          url: "/dashboard/settings/user",
           access: ["ADMIN"],
         },
       ],
