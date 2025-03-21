@@ -120,11 +120,11 @@ export function NavGroupForm() {
             )}
           />
 
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full" disabled={isLoading}>
             Submit
           </Button>
           <Link
-            href="/dashboard/settings/nav"
+            href="/dashboard/settings/nav-group"
             className={cn(buttonVariants({ variant: "outline" }))}
           >
             Back to Settings

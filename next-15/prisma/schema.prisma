@@ -31,8 +31,8 @@ model User {
   id        String    @id @default(cuid())
   email     String    @unique @db.VarChar(255)
   pwd       String
-  role      Role?     @relation(fields: [roleId], references: [id])
-  roleId    String?   @default("cm8e6uxkm000388qaq1984jaw")
+  role      Role      @relation(fields: [roleId], references: [id])
+  roleId    String    @default("cm8e6uxkm000388qaq1984jaw")
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
   createdBy String
@@ -40,15 +40,15 @@ model User {
 }
 
 model Access {
-  id         String    @id @default(cuid())
-  role       Role?     @relation(fields: [roleId], references: [id])
-  roleId     String?
-  navGroup   NavGroup? @relation(fields: [navGroupId], references: [id])
-  navGroupId String?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime? @updatedAt
-  createdBy  String
-  updatedBy  String?
+  id        String    @id @default(cuid())
+  role      Role      @relation(fields: [roleId], references: [id])
+  roleId    String
+  nav       Nav       @relation(fields: [navId], references: [id])
+  navId     String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  createdBy String
+  updatedBy String?
 }
 
 model NavGroup {
@@ -61,17 +61,18 @@ model NavGroup {
   createdBy String
   updatedBy String?
   Navs      Nav[]
-  Access    Access[]
 }
 
 model Nav {
   id         String    @id @default(cuid())
   title      String    @unique @db.VarChar(255)
   url        String
-  NavGroup   NavGroup? @relation(fields: [navGroupId], references: [id])
-  navGroupId String?
+  isActive   Boolean   @default(true)
+  NavGroup   NavGroup  @relation(fields: [navGroupId], references: [id])
+  navGroupId String
   createdAt  DateTime  @default(now())
   updatedAt  DateTime? @updatedAt
   createdBy  String
   updatedBy  String?
+  Access     Access[]
 }

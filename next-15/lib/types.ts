@@ -36,17 +36,6 @@ export type RoleProps = {
   updatedBy: string | null;
 };
 
-export type NavGroupProps = {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date | null;
-  createdBy: string;
-  updatedBy: string | null;
-  title: string;
-  url: string;
-  icon: string;
-};
-
 export type NavLinkProps = {
   id: string;
   title: string;
@@ -65,4 +54,11 @@ export type AllUserProps = {
   } | null;
   id: string;
   email: string;
+};
+
+export type NavGroupProps = {
+  id: string;
+  title: string;
+  url: string;
+  icon: string;
 };
