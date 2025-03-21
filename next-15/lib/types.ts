@@ -28,6 +28,7 @@ export type NavPayloadProps = {
   url: string;
   access: string[];
   isActive: boolean;
+  email: string;
 };
 
 export type RolePayloadProps = {

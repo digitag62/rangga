@@ -8,6 +8,7 @@ import { hashPassword } from "@/lib/helpers";
 import {
   LoginProps,
   NavGroupPayloadProps,
+  NavPayloadProps,
   RegisterProps,
   RolePayloadProps,
 } from "@/lib/types";
@@ -85,20 +86,22 @@ export const createNavGroup = async (payload: NavGroupPayloadProps) => {
   }
 };
 
-export const createNav = async (payload: NavGroupPayloadProps) => {
+export const createNav = async (payload: NavPayloadProps) => {
   try {
-    await prismadb.navGroup.create({
+    await prismadb.nav.create({
       data: {
         title: payload.title,
         url: payload.url,
-        icon: payload.icon,
+        isActive: payload.isActive,
+        access: payload.access,
+        navGroupId: payload.group,
         createdBy: payload.email,
       },
     });
 
-    return { success: true, message: "Create Nav Group: Success" };
+    return { success: true, message: "Create Nav: Success" };
   } catch (error) {
     console.log(error);
-    return { success: false, message: "Create Nav Group: Failed" };
+    return { success: false, message: "Create Nav: Failed" };
   }
 };

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { redirect, useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { cn, slugify } from "@/lib/utils";
 import Link from "next/link";
 
 import { z } from "zod";
@@ -28,14 +28,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { MultiSelect } from "@/components/ui/multi-select";
-import { authenticate, createNav } from "@/lib/actions";
-import { slugify } from "@/lib/helpers";
+import { useSession } from "next-auth/react";
+import { createNav } from "@/lib/actions";
 
 const formSchema = z.object({
   title: z.string().min(1, { message: "This field has to be filled." }),
-  url: z.string().min(1, { message: "This field has to be filled." }),
   group: z.string().min(1, { message: "This field has to be filled." }),
-  access: z.string().min(1, { message: "This field has to be filled." }),
+  access: z.array(z.string({ message: "This field has to be filled." })),
   isActive: z.string().min(1, { message: "This field has to be filled." }),
 });
 
@@ -52,7 +51,7 @@ interface navFormProps {
 
 export function NavForm({ navGroup, role }: navFormProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<string[]>([]);
+  const { data: session } = useSession();
 
   const { toast } = useToast();
   const router = useRouter();
@@ -64,7 +63,6 @@ export function NavForm({ navGroup, role }: navFormProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
-      url: "",
       isActive: "true",
     },
   });
@@ -73,8 +71,20 @@ export function NavForm({ navGroup, role }: navFormProps) {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     setIsLoading(true);
-    const url = slugify(values.title);
-    const res = await createNav();
+    const url = `${
+      navGroup.filter((nav) => nav.id === values.group)[0].url
+    }/${slugify(values.title)}`;
+
+    const payload = {
+      group: values.group,
+      title: values.title,
+      url,
+      access: values.access,
+      isActive: values.isActive === "true" ? true : false,
+      email: session?.user?.email!,
+    };
+
+    const res = await createNav(payload);
 
     if (res.success) {
       toast({
@@ -159,8 +169,8 @@ export function NavForm({ navGroup, role }: navFormProps) {
                 <FormControl>
                   <MultiSelect
                     options={roleOptions}
-                    onValueChange={setSelectedRole}
-                    defaultValue={selectedRole}
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
                     placeholder="Select role"
                     variant="inverted"
                     animation={0}
