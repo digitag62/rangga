@@ -27,7 +27,7 @@ const formSchema = z.object({
   role: z.string().min(1, { message: "This field has to be filled." }),
 });
 
-export function RoleForm() {
+export function RoleUpdate({ role }: { role: { id: string; role: string } }) {
   const [isLoading, setIsLoading] = useState(false);
   const { data: session } = useSession();
 
@@ -38,7 +38,7 @@ export function RoleForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      role: "",
+      role: role.role,
     },
   });
 

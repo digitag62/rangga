@@ -1,7 +1,7 @@
 "use server";
 
 import { AuthError } from "next-auth";
-import { signIn } from "@/auth";
+import { auth, signIn } from "@/auth";
 
 import prismadb from "@/lib/prisma";
 import { hashPassword } from "@/lib/helpers";
@@ -12,6 +12,67 @@ import {
   RegisterProps,
   RolePayloadProps,
 } from "@/lib/types";
+import { revalidatePath } from "next/cache";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+
+export async function checkSession(
+  type: "get" | "strict" | "admin-only",
+  email?: string
+) {
+  const session = await auth();
+  if (!session?.user)
+    return {
+      success: false,
+      message: "You are not authorized to call this action.",
+      data: null,
+    };
+
+  switch (type) {
+    case "strict":
+      if (session?.user.role !== "ADMIN")
+        return {
+          success: false,
+          message: "You are not authorized to call this action.",
+          data: null,
+        };
+      if (session.user.email === email)
+        return {
+          success: false,
+          message: "You are trying to altering yourself.",
+          data: null,
+        };
+      return {
+        success: true,
+        message: "User authorized to continue",
+        data: session,
+      };
+    case "admin-only":
+      if (session?.user.role !== "ADMIN")
+        return {
+          success: false,
+          message: "You are not authorized to call this action.",
+          data: null,
+        };
+      return {
+        success: true,
+        message: "User authorized to continue",
+        data: session,
+      };
+
+    case "get":
+      return {
+        success: true,
+        message: "User authorized to continue",
+        data: session,
+      };
+
+    default:
+      return {
+        success: false,
+        message: "Something went wrong at session check.",
+      };
+  }
+}
 
 export const createUser = async (payload: RegisterProps) => {
   const hashedPassword = await hashPassword(payload.password);
@@ -105,3 +166,45 @@ export const createNav = async (payload: NavPayloadProps) => {
     return { success: false, message: "Create Nav: Failed" };
   }
 };
+
+export async function deleteRole(id: string) {
+  const sessionCheck = await checkSession("admin-only");
+  if (!sessionCheck.success)
+    return { success: false, message: sessionCheck.message };
+
+  try {
+    await prismadb.role.delete({ where: { id } });
+    revalidatePath("/dashboard/settings/role");
+    return { success: true, message: "Role deleted successfully." };
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case "P2002": // Unique constraint failed
+          // console.error("Unique constraint failed:", error.message);
+          return {
+            success: false,
+            message: `Unique constraint failed: ${error.message}`,
+          };
+        case "P2003": // Unique constraint failed
+          // console.error("Unique constraint failed:", error.message);
+          return {
+            success: false,
+            message: `You are trying to delete role that already have an user.`,
+          };
+        case "P2016": // Foreign key constraint failed
+          // console.error("Foreign key constraint failed:", error.message);
+          return {
+            success: false,
+            message: `Foreign key constraint failed: ${error.message}`,
+          };
+        default:
+          // console.error("Known request error:", error.message);
+          return {
+            success: false,
+            message: `Known request error: ${error.message}`,
+          };
+      }
+    }
+    throw error;
+  }
+}
