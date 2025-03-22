@@ -1,14 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  Calculator,
-  Calendar,
-  CreditCard,
-  Settings,
-  Smile,
-  User,
-} from "lucide-react";
+import { Navigation, SquareArrowOutUpRight } from "lucide-react";
 
 import {
   CommandDialog,
@@ -21,9 +14,15 @@ import {
   CommandShortcut,
 } from "@/components/ui/command";
 import { DialogTitle } from "@radix-ui/react-dialog";
+import { links } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { Button } from "./ui/button";
+import DynamicIcon from "./dynamic-icon";
 
 export function SearchGlobal() {
   const [open, setOpen] = React.useState(false);
+  const { navMain } = links;
+  const router = useRouter();
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -39,48 +38,53 @@ export function SearchGlobal() {
 
   return (
     <div className="ml-auto">
-      <p className="text-sm text-muted-foreground">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => setOpen(true)}
+        className="text-sm text-muted-foreground"
+      >
         Search menu{" "}
         <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
           <span className="text-xs">⌘</span>K
         </kbd>
-      </p>
+      </Button>
       <CommandDialog open={open} onOpenChange={setOpen}>
         <DialogTitle className="sr-only"></DialogTitle>
         <CommandInput placeholder="Type a command or search..." />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
-          <CommandGroup heading="Suggestions">
-            <CommandItem>
-              <Calendar />
-              <span>Calendar</span>
-            </CommandItem>
-            <CommandItem>
-              <Smile />
-              <span>Search Emoji</span>
-            </CommandItem>
-            <CommandItem>
-              <Calculator />
-              <span>Calculator</span>
-            </CommandItem>
+          <CommandGroup heading="Nav Group">
+            {navMain.map((nav) => (
+              <CommandItem
+                key={nav.url}
+                onSelect={() => {
+                  router.push(nav.url);
+                  setOpen(false);
+                }}
+              >
+                <DynamicIcon name="settings-2" className="text-sm" />
+                <span>{nav.title}</span>
+              </CommandItem>
+            ))}
           </CommandGroup>
           <CommandSeparator />
-          <CommandGroup heading="Settings">
-            <CommandItem>
-              <User />
-              <span>Profile</span>
-              <CommandShortcut>⌘P</CommandShortcut>
-            </CommandItem>
-            <CommandItem>
-              <CreditCard />
-              <span>Billing</span>
-              <CommandShortcut>⌘B</CommandShortcut>
-            </CommandItem>
-            <CommandItem>
-              <Settings />
-              <span>Settings</span>
-              <CommandShortcut>⌘S</CommandShortcut>
-            </CommandItem>
+          <CommandGroup heading="Nav Links">
+            {navMain.map((nav) =>
+              nav.items.map((item) => (
+                <CommandItem
+                  key={item.url}
+                  onSelect={() => {
+                    router.push(item.url);
+                    setOpen(false);
+                  }}
+                >
+                  <Navigation size="sm" />
+                  <span>{item.title}</span>
+                  {/* <CommandShortcut>⌘P</CommandShortcut> */}
+                </CommandItem>
+              ))
+            )}
           </CommandGroup>
         </CommandList>
       </CommandDialog>
