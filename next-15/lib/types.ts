@@ -33,7 +33,6 @@ export type NavPayloadProps = {
 
 export type RolePayloadProps = {
   role: string;
-  email: string;
 };
 
 export type RoleProps = {

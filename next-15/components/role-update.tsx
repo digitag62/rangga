@@ -20,8 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
-import { createRole } from "@/lib/actions";
+import { updateRole } from "@/lib/actions";
 
 const formSchema = z.object({
   role: z.string().min(1, { message: "This field has to be filled." }),
@@ -29,7 +28,6 @@ const formSchema = z.object({
 
 export function RoleUpdate({ role }: { role: { id: string; role: string } }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { data: session } = useSession();
 
   const { toast } = useToast();
   const router = useRouter();
@@ -46,10 +44,7 @@ export function RoleUpdate({ role }: { role: { id: string; role: string } }) {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     setIsLoading(true);
-    const res = await createRole({
-      ...values,
-      email: session?.user?.email!,
-    });
+    const res = await updateRole(role.id, values);
 
     if (res.success) {
       toast({

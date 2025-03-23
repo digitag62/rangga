@@ -21,13 +21,13 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { createRole } from "@/lib/actions";
+import { createRole, updateRole } from "@/lib/actions";
 
 const formSchema = z.object({
   role: z.string().min(1, { message: "This field has to be filled." }),
 });
 
-export function RoleForm() {
+export function RoleForm({ role }: { role?: { id: string; role: string } }) {
   const [isLoading, setIsLoading] = useState(false);
   const { data: session } = useSession();
 
@@ -38,7 +38,7 @@ export function RoleForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      role: "",
+      role: role?.role || "",
     },
   });
 
@@ -46,14 +46,14 @@ export function RoleForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     setIsLoading(true);
-    const res = await createRole({
-      ...values,
-      email: session?.user?.email!,
-    });
+
+    const res = role
+      ? await updateRole(role?.id!, values)
+      : await createRole(values);
 
     if (res.success) {
       toast({
-        title: "Created Successfully!",
+        title: `${role ? "Updated" : "Created"} Successfully!`,
         description: res.message,
       });
       setIsLoading(false);
@@ -61,7 +61,7 @@ export function RoleForm() {
       router.push("/dashboard/settings/role");
     } else {
       toast({
-        title: "Create Failed!",
+        title: `${role ? "Updated" : "Created"} Failed!`,
         description: res.message,
       });
       setIsLoading(false);

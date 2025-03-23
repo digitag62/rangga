@@ -113,22 +113,6 @@ export const authenticate = async (payload: LoginProps) => {
   }
 };
 
-export const createRole = async (payload: RolePayloadProps) => {
-  try {
-    await prismadb.role.create({
-      data: {
-        role: payload.role.toUpperCase(),
-        createdBy: payload.email,
-      },
-    });
-
-    return { success: true, message: "Create Role: Success" };
-  } catch (error) {
-    console.log(error);
-    return { success: false, message: "Create Role: Failed" };
-  }
-};
-
 export const createNavGroup = async (payload: NavGroupPayloadProps) => {
   try {
     await prismadb.navGroup.create({
@@ -167,7 +151,105 @@ export const createNav = async (payload: NavPayloadProps) => {
   }
 };
 
-export async function deleteRole(id: string) {
+export const createRole = async (payload: RolePayloadProps) => {
+  const sessionCheck = await checkSession("admin-only");
+  if (!sessionCheck.success)
+    return { success: false, message: sessionCheck.message };
+
+  try {
+    await prismadb.role.create({
+      data: {
+        role: payload.role.toUpperCase(),
+        createdBy: sessionCheck.data?.user?.email!,
+      },
+    });
+
+    revalidatePath("/dashboard/settings/role");
+    return { success: true, message: "Create Role: Success" };
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case "P2002": // Unique constraint failed
+          // console.error("Unique constraint failed:", error.message);
+          return {
+            success: false,
+            message: `Unique constraint failed: ${payload.role.toUpperCase()} already registered`,
+          };
+        case "P2003": // Unique constraint failed
+          // console.error("Unique constraint failed:", error.message);
+          return {
+            success: false,
+            message: `You are trying to delete role that already have an user.`,
+          };
+        case "P2016": // Foreign key constraint failed
+          // console.error("Foreign key constraint failed:", error.message);
+          return {
+            success: false,
+            message: `Foreign key constraint failed: ${error.message}`,
+          };
+        default:
+          // console.error("Known request error:", error.message);
+          return {
+            success: false,
+            message: `Known request error: ${error.message}`,
+          };
+      }
+    }
+    throw error;
+  }
+};
+
+export const updateRole = async (id: string, values: RolePayloadProps) => {
+  const sessionCheck = await checkSession("admin-only");
+  if (!sessionCheck.success)
+    return { success: false, message: sessionCheck.message };
+
+  try {
+    await prismadb.role.update({
+      where: {
+        id: id,
+      },
+      data: {
+        role: values.role.toUpperCase(),
+        updatedBy: sessionCheck.data?.user?.email!,
+      },
+    });
+    revalidatePath("/dashboard/settings/role");
+    return { success: true, message: "Role updated successfully." };
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case "P2002": // Unique constraint failed
+          // console.error("Unique constraint failed:", error.message);
+          return {
+            success: false,
+            message: `Unique constraint failed: ${values.role.toUpperCase()} already registered`,
+          };
+        case "P2003": // Unique constraint failed
+          // console.error("Unique constraint failed:", error.message);
+          return {
+            success: false,
+            message: `You are trying to delete role that already have an user.`,
+          };
+        case "P2016": // Foreign key constraint failed
+          // console.error("Foreign key constraint failed:", error.message);
+          return {
+            success: false,
+            message: `Foreign key constraint failed: ${error.message}`,
+          };
+        default:
+          // console.error("Known request error:", error.message);
+          return {
+            success: false,
+            message: `Known request error: ${error.message}`,
+          };
+      }
+    }
+    throw error;
+  }
+};
+
+export const deleteRole = async (id: string) => {
   const sessionCheck = await checkSession("admin-only");
   if (!sessionCheck.success)
     return { success: false, message: sessionCheck.message };
@@ -207,4 +289,4 @@ export async function deleteRole(id: string) {
     }
     throw error;
   }
-}
+};
