@@ -11,6 +11,7 @@ import {
   NavPayloadProps,
   RegisterProps,
   RolePayloadProps,
+  UserPayloadProps,
 } from "@/lib/types";
 import { revalidatePath } from "next/cache";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
@@ -74,6 +75,26 @@ export async function checkSession(
   }
 }
 
+export const authenticate = async (payload: LoginProps) => {
+  try {
+    const res = await signIn("credentials", { ...payload, redirect: false });
+    return { success: true, message: `Welcome ${payload.email}` };
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case "CredentialsSignin":
+          return { success: false, message: "Invalid Credentials" };
+        default:
+          return {
+            success: false,
+            message: "There was a problem with your request",
+          };
+      }
+    }
+    throw error;
+  }
+};
+
 export const createUser = async (payload: RegisterProps) => {
   const hashedPassword = await hashPassword(payload.password);
 
@@ -93,19 +114,109 @@ export const createUser = async (payload: RegisterProps) => {
   }
 };
 
-export const authenticate = async (payload: LoginProps) => {
+export const updateUser = async (id: string, values: UserPayloadProps) => {
+  const sessionCheck = await checkSession("strict", values.email);
+  if (!sessionCheck.success)
+    return { success: false, message: sessionCheck.message };
+
   try {
-    const res = await signIn("credentials", { ...payload, redirect: false });
-    return { success: true, message: `Welcome ${payload.email}` };
+    if (values.pwd) {
+      const hashedPassword = await hashPassword(values.pwd);
+
+      await prismadb.user.update({
+        where: {
+          id: id,
+        },
+        data: {
+          email: values.email,
+          pwd: hashedPassword,
+          roleId: values.roleId,
+          updatedBy: sessionCheck.data?.user?.email!,
+        },
+      });
+    } else {
+      await prismadb.user.update({
+        where: {
+          id: id,
+        },
+        data: {
+          email: values.email,
+          roleId: values.roleId,
+          updatedBy: sessionCheck.data?.user?.email!,
+        },
+      });
+    }
+
+    revalidatePath("/dashboard/settings/user");
+    return { success: true, message: "User updated successfully." };
   } catch (error) {
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case "CredentialsSignin":
-          return { success: false, message: "Invalid Credentials" };
-        default:
+    if (error instanceof PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case "P2002": // Unique constraint failed
+          // console.error("Unique constraint failed:", error.message);
           return {
             success: false,
-            message: "There was a problem with your request",
+            message: `Unique constraint failed: ${values.email} already registered`,
+          };
+        case "P2003": // Unique constraint failed
+          // console.error("Unique constraint failed:", error.message);
+          return {
+            success: false,
+            message: `You are trying to delete user that already have an user.`,
+          };
+        case "P2016": // Foreign key constraint failed
+          // console.error("Foreign key constraint failed:", error.message);
+          return {
+            success: false,
+            message: `Foreign key constraint failed: ${error.message}`,
+          };
+        default:
+          // console.error("Known request error:", error.message);
+          return {
+            success: false,
+            message: `Known request error: ${error.message}`,
+          };
+      }
+    }
+    throw error;
+  }
+};
+
+export const deleteUser = async (id: string, email: string) => {
+  const sessionCheck = await checkSession("strict", email);
+  if (!sessionCheck.success)
+    return { success: false, message: sessionCheck.message };
+
+  try {
+    await prismadb.user.delete({ where: { id } });
+    revalidatePath("/dashboard/settings/user");
+    return { success: true, message: "User deleted successfully." };
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case "P2002": // Unique constraint failed
+          // console.error("Unique constraint failed:", error.message);
+          return {
+            success: false,
+            message: `Unique constraint failed: ${error.message}`,
+          };
+        case "P2003": // Unique constraint failed
+          // console.error("Unique constraint failed:", error.message);
+          return {
+            success: false,
+            message: `You are trying to delete user that already have an user.`,
+          };
+        case "P2016": // Foreign key constraint failed
+          // console.error("Foreign key constraint failed:", error.message);
+          return {
+            success: false,
+            message: `Foreign key constraint failed: ${error.message}`,
+          };
+        default:
+          // console.error("Known request error:", error.message);
+          return {
+            success: false,
+            message: `Known request error: ${error.message}`,
           };
       }
     }

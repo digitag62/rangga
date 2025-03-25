@@ -15,6 +15,12 @@ export type User = {
   roleId: string;
 };
 
+export type UserPayloadProps = {
+  email: string;
+  pwd?: string;
+  roleId: string;
+};
+
 export type NavGroupPayloadProps = {
   title: string;
   url: string;

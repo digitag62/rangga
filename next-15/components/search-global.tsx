@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Navigation, SquareArrowOutUpRight } from "lucide-react";
+import { Navigation } from "lucide-react";
 
 import {
   CommandDialog,
@@ -11,13 +11,13 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-  CommandShortcut,
 } from "@/components/ui/command";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { links } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import DynamicIcon from "./dynamic-icon";
+import { signOut } from "next-auth/react";
 
 export function SearchGlobal() {
   const [open, setOpen] = React.useState(false);
@@ -67,6 +67,15 @@ export function SearchGlobal() {
                 <span>{nav.title}</span>
               </CommandItem>
             ))}
+            <CommandItem
+              onSelect={() => {
+                setOpen(false);
+                signOut();
+              }}
+            >
+              <DynamicIcon name="log-out" className="text-sm" />
+              <span>Log out</span>
+            </CommandItem>
           </CommandGroup>
           <CommandSeparator />
           <CommandGroup heading="Nav Links">

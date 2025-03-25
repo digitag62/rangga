@@ -36,7 +36,7 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   searchBy: string;
-  url: string;
+  url?: string;
 }
 
 export function DataTable<TData, TValue>({
@@ -81,13 +81,17 @@ export function DataTable<TData, TValue>({
           className="max-w-sm"
         />
         <DataTableViewOptions table={table} />
-        <Link
-          href={url}
-          className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
-        >
-          <PlusCircle />
-          New
-        </Link>
+        {url ? (
+          <Link
+            href={url}
+            className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+          >
+            <PlusCircle />
+            New
+          </Link>
+        ) : (
+          ""
+        )}
 
         {/* <DropdownMenu>
           <DropdownMenuTrigger asChild>

@@ -3,7 +3,6 @@
 import { RoleProps } from "@/lib/types";
 import { ColumnDef } from "@tanstack/react-table";
 
-import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -32,7 +31,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 
 export const columns: ColumnDef<RoleProps>[] = [
-  {
+  /*{
     id: "select",
     header: ({ table }) => (
       <Checkbox
@@ -53,7 +52,7 @@ export const columns: ColumnDef<RoleProps>[] = [
     ),
     enableSorting: false,
     enableHiding: false,
-  },
+  },*/
   {
     accessorKey: "role",
     cell: ({ row }) => {

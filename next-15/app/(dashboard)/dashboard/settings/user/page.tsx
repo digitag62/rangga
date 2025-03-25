@@ -22,12 +22,7 @@ const UserPage = async () => {
     <div className="min-h-screen flex justify-center">
       <div className="p-12 space-y-6 w-full gap-2">
         <h1 className="text-xl">User Settings</h1>
-        <DataTable
-          columns={columns}
-          data={data}
-          searchBy="email"
-          url="/dashboard/settings/user/create"
-        />
+        <DataTable columns={columns} data={data} searchBy="email" />
       </div>
     </div>
   );
