@@ -95,6 +95,7 @@ export const authenticate = async (payload: LoginProps) => {
   }
 };
 
+// User
 export const createUser = async (payload: RegisterProps) => {
   const hashedPassword = await hashPassword(payload.password);
 
@@ -224,21 +225,150 @@ export const deleteUser = async (id: string, email: string) => {
   }
 };
 
+// NavGroup
 export const createNavGroup = async (payload: NavGroupPayloadProps) => {
+  const sessionCheck = await checkSession("admin-only");
+  if (!sessionCheck.success)
+    return { success: false, message: sessionCheck.message };
+
   try {
     await prismadb.navGroup.create({
       data: {
         title: payload.title,
         url: payload.url,
         icon: payload.icon,
-        createdBy: payload.email,
+        createdBy: sessionCheck.data?.user?.email!,
       },
     });
 
     return { success: true, message: "Create Nav Group: Success" };
   } catch (error) {
-    console.log(error);
-    return { success: false, message: "Create Nav Group: Failed" };
+    if (error instanceof PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case "P2002": // Unique constraint failed
+          // console.error("Unique constraint failed:", error.message);
+          return {
+            success: false,
+            message: `Unique constraint failed: ${payload.title} already registered`,
+          };
+        case "P2003": // Unique constraint failed
+          // console.error("Unique constraint failed:", error.message);
+          return {
+            success: false,
+            message: `You are trying to delete nav group that already have an user.`,
+          };
+        case "P2016": // Foreign key constraint failed
+          // console.error("Foreign key constraint failed:", error.message);
+          return {
+            success: false,
+            message: `Foreign key constraint failed: ${error.message}`,
+          };
+        default:
+          // console.error("Known request error:", error.message);
+          return {
+            success: false,
+            message: `Known request error: ${error.message}`,
+          };
+      }
+    }
+    throw error;
+  }
+};
+
+export const updateNavGroup = async (
+  id: string,
+  values: NavGroupPayloadProps
+) => {
+  const sessionCheck = await checkSession("admin-only");
+  if (!sessionCheck.success)
+    return { success: false, message: sessionCheck.message };
+
+  try {
+    await prismadb.navGroup.update({
+      where: {
+        id: id,
+      },
+      data: {
+        title: values.title,
+        url: values.url,
+        icon: values.icon,
+        updatedBy: sessionCheck.data?.user?.email!,
+      },
+    });
+    revalidatePath("/dashboard/settings/nav-group");
+    return { success: true, message: "NavGroup updated successfully." };
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case "P2002": // Unique constraint failed
+          // console.error("Unique constraint failed:", error.message);
+          return {
+            success: false,
+            message: `Unique constraint failed: ${values.title.toUpperCase()} already registered`,
+          };
+        case "P2003": // Unique constraint failed
+          // console.error("Unique constraint failed:", error.message);
+          return {
+            success: false,
+            message: `You are trying to delete nav group that already have an user.`,
+          };
+        case "P2016": // Foreign key constraint failed
+          // console.error("Foreign key constraint failed:", error.message);
+          return {
+            success: false,
+            message: `Foreign key constraint failed: ${error.message}`,
+          };
+        default:
+          // console.error("Known request error:", error.message);
+          return {
+            success: false,
+            message: `Known request error: ${error.message}`,
+          };
+      }
+    }
+    throw error;
+  }
+};
+
+export const deleteNavGroup = async (id: string) => {
+  const sessionCheck = await checkSession("admin-only");
+  if (!sessionCheck.success)
+    return { success: false, message: sessionCheck.message };
+
+  try {
+    await prismadb.navGroup.delete({ where: { id } });
+    revalidatePath("/dashboard/settings/nav-group");
+    return { success: true, message: "Nav Group deleted successfully." };
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError) {
+      switch (error.code) {
+        case "P2002": // Unique constraint failed
+          // console.error("Unique constraint failed:", error.message);
+          return {
+            success: false,
+            message: `Unique constraint failed: ${error.message}`,
+          };
+        case "P2003": // Unique constraint failed
+          // console.error("Unique constraint failed:", error.message);
+          return {
+            success: false,
+            message: `You are trying to delete nav group that already have a nav.`,
+          };
+        case "P2016": // Foreign key constraint failed
+          // console.error("Foreign key constraint failed:", error.message);
+          return {
+            success: false,
+            message: `Foreign key constraint failed: ${error.message}`,
+          };
+        default:
+          // console.error("Known request error:", error.message);
+          return {
+            success: false,
+            message: `Known request error: ${error.message}`,
+          };
+      }
+    }
+    throw error;
   }
 };
 
@@ -262,6 +392,7 @@ export const createNav = async (payload: NavPayloadProps) => {
   }
 };
 
+// role
 export const createRole = async (payload: RolePayloadProps) => {
   const sessionCheck = await checkSession("admin-only");
   if (!sessionCheck.success)

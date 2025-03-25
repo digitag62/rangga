@@ -25,7 +25,6 @@ export type NavGroupPayloadProps = {
   title: string;
   url: string;
   icon: string;
-  email: string;
 };
 
 export type NavPayloadProps = {

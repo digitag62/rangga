@@ -21,7 +21,8 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { createNavGroup } from "@/lib/actions";
+import { createNavGroup, updateNavGroup } from "@/lib/actions";
+import { NavGroupProps } from "@/lib/types";
 
 const formSchema = z.object({
   title: z.string().min(1, { message: "This field has to be filled." }),
@@ -32,9 +33,11 @@ const formSchema = z.object({
 export function NavGroupForm({
   navId,
   referal,
+  navGroup,
 }: {
-  navId: string | null;
-  referal: string | null;
+  navId?: string | null;
+  referal?: string | null;
+  navGroup?: NavGroupProps;
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const { data: session } = useSession();
@@ -55,8 +58,9 @@ export function NavGroupForm({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: "",
-      url: "",
+      title: navGroup?.title || "",
+      url: navGroup?.url || "",
+      icon: navGroup?.icon || "",
     },
   });
 
@@ -64,10 +68,9 @@ export function NavGroupForm({
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     setIsLoading(true);
-    const res = await createNavGroup({
-      ...values,
-      email: session?.user?.email!,
-    });
+    const res = navGroup
+      ? await updateNavGroup(navGroup.id, values)
+      : await createNavGroup(values);
 
     if (res.success) {
       toast({
@@ -135,15 +138,17 @@ export function NavGroupForm({
             )}
           />
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            Submit
-          </Button>
-          <Link
-            href={redirectPath}
-            className={cn(buttonVariants({ variant: "outline" }))}
-          >
-            Back to Settings
-          </Link>
+          <div className="flex justify-center items-center gap-2 mt-2">
+            <Link
+              href={redirectPath}
+              className={cn(buttonVariants({ variant: "outline" }), "w-full")}
+            >
+              Cancel
+            </Link>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              Submit
+            </Button>
+          </div>
         </div>
       </form>
     </Form>
