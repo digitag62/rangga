@@ -1,8 +1,9 @@
 "use server";
 
-import { hashPassword } from "@/lib/helper";
-import { RegisterPayload } from "@/lib/types";
+import { comparePasswordHash, createJWT, hashPassword } from "@/lib/helper";
+import { AuthPayload } from "@/lib/types";
 import { prismadb } from "@/lib/prismadb";
+import { success } from "zod/v4";
 
 export const seedRole = async () => {
 	try {
@@ -30,7 +31,7 @@ export const getRoleByName = async (name: string) => {
 	}
 };
 
-export const createUser = async (payload: RegisterPayload) => {
+export const createUser = async (payload: AuthPayload) => {
 	const { email, password } = payload;
 	const hashedPass = await hashPassword(password);
 
@@ -51,5 +52,27 @@ export const createUser = async (payload: RegisterPayload) => {
 	} catch (err) {
 		console.log(err);
 		return { success: false, message: "Register User: Failed" };
+	}
+};
+
+export const authenticate = async (values: AuthPayload) => {
+	const { email, password } = values;
+
+	try {
+		// Check email
+		const user = await prismadb.user.findUnique({ where: { email }, include: { role: { select: { role: true } } } });
+		if (!user) return { success: false, message: "Login Failed: Invalid credentials" };
+
+		// Check password
+		const compPassw = await comparePasswordHash(password, user.pwd);
+		if (!compPassw) return { success: false, message: "Login Failed: Invalid credentials" };
+
+		const token = await createJWT(user.id);
+		if (!token) return { success: false, message: "Login Failed: Invalid credentials" };
+
+		return { success: true, message: "Login Success: Welcome to the Jungle!", token, user };
+	} catch (err) {
+		console.log(err);
+		return { success: false, message: "Login Failed: Please try again" };
 	}
 };

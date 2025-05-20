@@ -11,6 +11,9 @@ import Link from "next/link";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { authenticate } from "@/lib/actions";
+import { toast } from "sonner";
+import useAuthStore from "@/store/useAuthStore";
 
 const formSchema = z.object({
 	email: z.string().min(1, { message: "This field has to be filled." }).email("This is not a valid email."),
@@ -20,6 +23,8 @@ const formSchema = z.object({
 export function LoginForm() {
 	const [isLoading, setIsLoading] = useState(false);
 	const router = useRouter();
+
+	const login = useAuthStore.useLogin();
 
 	// 1. Define your form.
 	const form = useForm<z.infer<typeof formSchema>>({
@@ -34,18 +39,31 @@ export function LoginForm() {
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		// Do something with the form values.
 		setIsLoading(true);
-		// const res = await authenticate(values);
-		const res = { success: false };
+		const toastLoad = toast.loading("Loading..");
 
-		if (res.success) {
-			// toast({ title: "Signed In!", description: res.message });
-			setIsLoading(false);
+		const res = await authenticate(values);
 
-			router.push("/dashboard");
-		} else {
-			// toast({ title: "Sign Up Failed!", description: res.message });
+		if (!res.success) {
 			setIsLoading(false);
+			toast.dismiss(toastLoad);
+			toast.error(res.message);
+
 			form.reset();
+		} else {
+			localStorage.setItem("token", res.token!);
+
+			login({
+				id: res.user?.id!,
+				email: res.user?.email!,
+				role: res.user?.role.role!,
+				token: res.token!,
+			});
+			
+			setIsLoading(false);
+			toast.dismiss(toastLoad);
+			toast.success(res.message);
+
+			router.push("/login");
 		}
 	}
 
