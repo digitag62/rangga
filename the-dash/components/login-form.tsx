@@ -58,12 +58,12 @@ export function LoginForm() {
 				role: res.user?.role.role!,
 				token: res.token!,
 			});
-			
+
 			setIsLoading(false);
 			toast.dismiss(toastLoad);
 			toast.success(res.message);
 
-			router.push("/login");
+			router.push("/dashboard");
 		}
 	}
 

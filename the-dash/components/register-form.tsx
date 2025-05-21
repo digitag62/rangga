@@ -46,18 +46,20 @@ export function RegisterForm() {
 	// 2. Define a submit handler.
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		setIsLoading(true);
-		toast.loading("Loading..");
+		const toastLoad = toast.loading("Loading..");
 
 		const res = await createUser(values);
 
-		if (res.success) {
+		if (!res.success) {
 			setIsLoading(false);
+			toast.dismiss(toastLoad);
+			toast.error("Something went wrong, please try again!");
+		} else {
+			setIsLoading(false);
+			toast.dismiss(toastLoad);
 			toast.success("Register success, please try to login!");
 
 			router.push("/login");
-		} else {
-			setIsLoading(false);
-			toast.error("Something went wrong, please try again!");
 		}
 	}
 

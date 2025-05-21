@@ -1,9 +1,9 @@
 "use server";
 
-import { comparePasswordHash, createJWT, hashPassword } from "@/lib/helper";
+import { comparePasswordHash, hashPassword } from "@/lib/helper";
 import { AuthPayload } from "@/lib/types";
 import { prismadb } from "@/lib/prismadb";
-import { success } from "zod/v4";
+import { createJWT, verifyToken } from "@/lib/session";
 
 export const seedRole = async () => {
 	try {
@@ -74,5 +74,17 @@ export const authenticate = async (values: AuthPayload) => {
 	} catch (err) {
 		console.log(err);
 		return { success: false, message: "Login Failed: Please try again" };
+	}
+};
+
+export const getCurrentUser = async (token: string) => {
+	const { id } = await verifyToken(token);
+	console.log("userId aaaaa", id);
+	try {
+		const user = await prismadb.user.findUnique({ where: { id: id as string }, include: { role: { select: { role: true } } } });
+		return { success: true, message: "Get Role: Success", data: user };
+	} catch (err) {
+		console.log(err);
+		return { success: false, message: "Get Role: Failed" };
 	}
 };
