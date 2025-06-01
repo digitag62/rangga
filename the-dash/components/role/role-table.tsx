@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { RoleProps } from "@/lib/types";
 import { DataTable } from "@/components/ui/datatable";
-import { RoleForm } from "@/components/role-form";
+import { RoleForm } from "@/components/role/role-form";
 import { Button } from "@/components/ui/button";
-import { columns as getColumns } from "@/app/(dashboard)/role/columns";
+import { columns as getColumns } from "@/components/role/role-columns";
 import { PlusCircle } from "lucide-react";
+import { RoleProps } from "@/lib/role/types";
 
 export const RoleTableClient = ({ data }: { data: RoleProps[] }) => {
 	const [isOpen, setIsOpen] = useState(false);

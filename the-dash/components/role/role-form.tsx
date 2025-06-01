@@ -10,10 +10,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { createRole, updateRole } from "@/lib/actions";
-import { RoleProps } from "@/lib/types";
+import { RoleProps } from "@/lib/role/types";
+import { createRole, updateRole } from "@/lib/role/actions";
 
 const formSchema = z.object({
 	role: z.string().min(1, { message: "This field has to be filled." }),

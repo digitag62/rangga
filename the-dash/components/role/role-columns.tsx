@@ -1,6 +1,5 @@
 "use client";
 
-import { RoleProps } from "@/lib/types";
 import { ColumnDef } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
@@ -10,9 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import { MoreHorizontal } from "lucide-react";
 import { DataTableColumnHeader } from "@/components/ui/datatable-column-header";
 import { FormEvent, useState } from "react";
-import { deleteRole } from "@/lib/actions";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { RoleProps } from "@/lib/role/types";
+import { deleteRole } from "@/lib/role/actions";
 
 export const columns = ({ setIsOpen, setSelectedRole }: { setIsOpen: (val: boolean) => void; setSelectedRole: (role: RoleProps | null) => void }): ColumnDef<RoleProps>[] => [
 	{

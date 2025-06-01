@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { prismadb } from "@/lib/prismadb";
-import { RoleTableClient } from "@/components/role-table";
+import { RoleTableClient } from "@/components/role/role-table";
 
 const RolePage = async () => {
 	return (
@@ -17,7 +17,6 @@ const RolePage = async () => {
 const Content = async () => {
 	const data = await prismadb.role.findMany({ select: { id: true, role: true, isActive: true }, where: { NOT: { role: "ADMIN" } } });
 
-	// return <DataTable columns={columns} data={data} searchBy="role" url="/role" createForm={<RoleForm data={null} />} />;
 	return <RoleTableClient data={data} />;
 };
 export default RolePage;

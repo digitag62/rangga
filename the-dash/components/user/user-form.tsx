@@ -1,27 +1,29 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-
+import { toast } from "sonner";
+import { useForm } from "react-hook-form";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { toast } from "sonner";
-import { RoleProps, User, UserWithRoleType } from "@/lib/types";
-import { updateUser } from "@/lib/actions";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+import { UserWithRoleProps } from "@/lib/user/types";
+import { updateUser } from "@/lib/user/actions";
+import { RoleProps } from "@/lib/role/types";
 
 const formSchema = z.object({
 	email: z.string().min(1, { message: "This field has to be filled." }).email("This is not a valid email."),
-	role: z.string(),
+	roleId: z.string(),
 	isActive: z.string(),
 });
 
-export const UserForm = ({ data, roles, user, isOpen, setIsOpen }: { data: UserWithRoleType | null; roles: RoleProps[]; user: User | null; isOpen: boolean; setIsOpen: React.Dispatch<React.SetStateAction<boolean>> }) => {
+export const UserForm = ({ data, roles, isOpen, setIsOpen }: { data: UserWithRoleProps | null; roles: RoleProps[]; isOpen: boolean; setIsOpen: React.Dispatch<React.SetStateAction<boolean>> }) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const isMobile = useIsMobile();
 
@@ -29,7 +31,7 @@ export const UserForm = ({ data, roles, user, isOpen, setIsOpen }: { data: UserW
 		resolver: zodResolver(formSchema),
 		defaultValues: {
 			email: "",
-			role: "",
+			roleId: "",
 			isActive: "true",
 		},
 	});
@@ -38,7 +40,7 @@ export const UserForm = ({ data, roles, user, isOpen, setIsOpen }: { data: UserW
 		if (isOpen) {
 			form.reset({
 				email: data?.email ?? "",
-				role: data?.role.id ?? "",
+				roleId: data?.role.id ?? "",
 				isActive: data?.isActive.toString() ?? "true",
 			});
 		}
@@ -54,7 +56,7 @@ export const UserForm = ({ data, roles, user, isOpen, setIsOpen }: { data: UserW
 		const toastLoad = toast.loading("Loading..");
 
 		if (data) {
-			const res = await updateUser(values, data.id, user?.email!);
+			const res = await updateUser(values, data.id);
 
 			if (!res.success) {
 				setIsLoading(false);
@@ -101,7 +103,7 @@ export const UserForm = ({ data, roles, user, isOpen, setIsOpen }: { data: UserW
 							<div className="flex flex-col gap-3">
 								<FormField
 									control={form.control}
-									name="role"
+									name="roleId"
 									render={({ field }) => (
 										<FormItem>
 											<FormLabel>Role</FormLabel>

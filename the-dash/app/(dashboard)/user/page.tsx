@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { prismadb } from "@/lib/prismadb";
-import { UserTableClient } from "@/components/user-table";
+import { UserTableClient } from "@/components/user/user-table";
 
 const UserPage = () => {
 	return (
