@@ -1,7 +1,7 @@
 "use server";
 
 import { comparePasswordHash, hashPassword } from "@/lib/helper";
-import { AuthPayload, RolePayload } from "@/lib/types";
+import { AuthPayload, RolePayload, UserPayload } from "@/lib/types";
 import { prismadb } from "@/lib/prismadb";
 import { createJWT, verifyToken } from "@/lib/session";
 import { cookies } from "next/headers";
@@ -55,30 +55,6 @@ export const getRoleByName = async (name: string) => {
 	} catch (err) {
 		console.log(err);
 		return { success: false, message: "Get Role: Failed" };
-	}
-};
-
-export const createUser = async (payload: AuthPayload) => {
-	const { email, password } = payload;
-	const hashedPass = await hashPassword(password);
-
-	const userRoleId = await getRoleByName("USER");
-	if (!userRoleId) return { success: false, message: "Register User: Failed, no role provided." };
-
-	try {
-		await prismadb.user.create({
-			data: {
-				email: email,
-				pwd: hashedPass,
-				roleId: userRoleId?.data?.id!,
-				createdBy: email,
-			},
-		});
-
-		return { success: true, message: "Register User: Success" };
-	} catch (err) {
-		console.log(err);
-		return { success: false, message: "Register User: Failed" };
 	}
 };
 
@@ -267,3 +243,83 @@ export const updateRole = async (payload: RolePayload, id: string) => {
 	}
 };
 /* ======= END OF ROLE REGION ======= */
+
+/* ======= START OF USER REGION ======= */
+export const createUser = async (payload: AuthPayload) => {
+	const { email, password } = payload;
+	const hashedPass = await hashPassword(password);
+
+	const userRoleId = await getRoleByName("USER");
+	if (!userRoleId) return { success: false, message: "Register User: Failed, no role provided." };
+
+	try {
+		await prismadb.user.create({
+			data: {
+				email: email,
+				pwd: hashedPass,
+				roleId: userRoleId?.data?.id!,
+				createdBy: email,
+			},
+		});
+
+		return { success: true, message: "Register User: Success" };
+	} catch (error) {
+		if (typeof error === "object" && error !== null && "code" in error && typeof error.code === "string") {
+			switch (error.code) {
+				case "P2002": // Unique constraint failed (You tried to create or update a record that would violate a @unique constraint.)
+					return { success: false, message: `${email} already exists. email must be unique.` };
+				case "P2003": // Foreign Key Constraint Failed (You tried to reference or delete a record that's linked to another via a foreign key.)
+					return { success: false, message: `Cannot delete user. It's assigned to users.` };
+				case "P2016": // Query interpretation error (Can happen if your query tries to reference something that doesn’t exist.)
+					return { success: false, message: `Reference not found` };
+				case "P2025":
+					return { success: false, message: "Record not found" };
+				default:
+					return { success: false, message: `Known request error: ${(error as any).message}` };
+			}
+		}
+
+		return { success: false, message: "An unexpected error occurred." };
+	}
+};
+
+export const updateUser = async (payload: UserPayload, id: string) => {
+	const sessionCheck = await checkSession("admin-only");
+	if (!sessionCheck.success) return { success: false, message: sessionCheck.message };
+
+	const { email, role, isActive } = payload;
+	const status = isActive === "true" ? true : false;
+
+	try {
+		await prismadb.user.update({
+			data: {
+				email: email,
+				roleId: role,
+				isActive: status,
+				updatedBy: sessionCheck.data?.email!,
+			},
+			where: { id },
+		});
+
+		revalidatePath("/user");
+		return { success: true, message: "Update User: Success" };
+	} catch (error) {
+		if (typeof error === "object" && error !== null && "code" in error && typeof error.code === "string") {
+			switch (error.code) {
+				case "P2002": // Unique constraint failed (You tried to create or update a record that would violate a @unique constraint.)
+					return { success: false, message: `${payload.email} already exists. User must be unique.` };
+				case "P2003": // Foreign Key Constraint Failed (You tried to reference or delete a record that's linked to another via a foreign key.)
+					return { success: false, message: `Cannot delete user. It's assigned to something.` };
+				case "P2016": // Query interpretation error (Can happen if your query tries to reference something that doesn’t exist.)
+					return { success: false, message: `Reference not found` };
+				case "P2025":
+					return { success: false, message: "Record not found" };
+				default:
+					return { success: false, message: `Known request error: ${(error as any).message}` };
+			}
+		}
+
+		return { success: false, message: "An unexpected error occurred." };
+	}
+};
+/* ======= END OF USER REGION ======= */

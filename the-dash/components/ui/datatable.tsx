@@ -15,7 +15,7 @@ interface DataTableProps<TData, TValue> {
 	data: TData[];
 	searchBy: string;
 	url?: string;
-	createForm: React.ReactNode;
+	createForm?: React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({ columns, data, searchBy, url, createForm }: DataTableProps<TData, TValue>) {

@@ -8,6 +8,12 @@ export type RolePayload = {
 	isActive: string;
 };
 
+export type UserPayload = {
+	email: string;
+	role: string;
+	isActive: string;
+};
+
 export type UserWithRoleType = {
 	id: string;
 	email: string;

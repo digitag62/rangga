@@ -1,34 +1,24 @@
-"use client";
-
-import { useEffect } from "react";
-// import { getAllUsers } from "@/lib/actions";
-// import { UserWithRoleType } from "@/lib/types";
-import useUserStore from "@/store/useUserStore";
-
-const TTL_MS = 5 * 60 * 1000; // 5 minutes
+import { Suspense } from "react";
+import { prismadb } from "@/lib/prismadb";
+import { UserTableClient } from "@/components/user-table";
 
 const UserPage = () => {
-	// const [users, setUsers] = useState<UserWithRoleType[]>();
-	// const [load, setLoad] = useState(false);
+	return (
+		<div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+			<div className="px-4 lg:px-6">
+				<Suspense fallback={<div>Loading...</div>}>
+					<Content />
+				</Suspense>
+			</div>
+		</div>
+	);
+};
 
-	/*useEffect(() => {
-		setLoad(true);
-		const fetchData = async () => {
-			const res = await getAllUsers();
-			setLoad(false);
-			setUsers(res.data);
-		};
+const Content = async () => {
+	const data = await prismadb.user.findMany({ select: { id: true, email: true, isActive: true, role: { select: { id: true, role: true } } } });
+	const roles = await prismadb.role.findMany({ select: { role: true, id: true, isActive: true }, where: { isActive: true } });
 
-		fetchData().catch((err) => console.log(err));
-	}, []);*/
-
-	const { users, isLoading, fetchUsers, shouldRefetch } = useUserStore();
-
-	useEffect(() => {
-		if (!users || shouldRefetch(TTL_MS)) fetchUsers();
-	}, [users, fetchUsers, shouldRefetch]);
-
-	return <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">{isLoading ? <div>Loading</div> : <div>{users && users.map((user) => user.email)}</div>}</div>;
+	return <UserTableClient data={data} roles={roles} />;
 };
 
 export default UserPage;
