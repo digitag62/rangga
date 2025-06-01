@@ -1,37 +1,36 @@
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
-import { SectionCards } from "@/components/section-cards";
-import { ChartAreaInteractive } from "@/components/chart-area-interactive";
-import { DataTable } from "@/components/data-table";
-import data from "@/app/aaaaa/data.json";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/actions";
+import HydrateZustand from "@/components/hydrate-zustand";
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
+	const token = (await cookies()).get("token")?.value;
+	if (!token) redirect("/login");
+
+	const user = await getCurrentUser(token); // decode, DB lookup, etc.
+	if (!user) redirect("/login");
+
 	return (
-		<SidebarProvider
-			style={
-				{
-					"--sidebar-width": "calc(var(--spacing) * 72)",
-					"--header-height": "calc(var(--spacing) * 12)",
-				} as React.CSSProperties
-			}
-		>
-			<AppSidebar variant="inset" />
-			<SidebarInset>
-				<SiteHeader />
-				<div className="flex flex-1 flex-col">
-					<div className="@container/main flex flex-1 flex-col gap-2">
-						<div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-							{children}
-							<SectionCards />
-							<div className="px-4 lg:px-6">
-								<ChartAreaInteractive />
-							</div>
-							<DataTable data={data} />
-						</div>
+		<HydrateZustand user={user.data}>
+			<SidebarProvider
+				style={
+					{
+						"--sidebar-width": "calc(var(--spacing) * 72)",
+						"--header-height": "calc(var(--spacing) * 12)",
+					} as React.CSSProperties
+				}
+			>
+				<AppSidebar variant="inset" />
+				<SidebarInset>
+					<SiteHeader />
+					<div className="flex flex-1 flex-col">
+						<div className="@container/main flex flex-1 flex-col gap-2">{children}</div>
 					</div>
-				</div>
-			</SidebarInset>
-		</SidebarProvider>
+				</SidebarInset>
+			</SidebarProvider>
+		</HydrateZustand>
 	);
 }

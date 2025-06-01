@@ -2,7 +2,6 @@
 
 import { RegisterForm } from "@/components/register-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import withAuth from "@/components/with-auth";
 import { cn } from "@/lib/utils";
 
 const RegisterPage = () => {
@@ -25,4 +24,4 @@ const RegisterPage = () => {
 	);
 };
 
-export default withAuth(RegisterPage, "auth");
+export default RegisterPage;

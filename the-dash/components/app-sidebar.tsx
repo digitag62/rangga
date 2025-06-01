@@ -1,9 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { IconCamera, IconChartBar, IconDashboard, IconDatabase, IconFileAi, IconFileDescription, IconFileWord, IconFolder, IconHelp, IconInnerShadowTop, IconListDetails, IconReport, IconSearch, IconSettings, IconUsers } from "@tabler/icons-react";
+import { IconCamera, IconDashboard, IconDatabase, IconFileAi, IconFileDescription, IconFileWord, IconHelp, IconMoneybag, IconReport, IconSearch, IconSettings, IconUsers, IconUserStar } from "@tabler/icons-react";
 
-import { NavDocuments } from "@/components/nav-documents";
+// import { NavDocuments } from "@/components/nav-documents";
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
@@ -20,28 +20,21 @@ let data = {
 	navMain: [
 		{
 			title: "Dashboard",
-			url: "#",
+			url: "/dashboard",
+			role: ["ADMIN", "USER"],
 			icon: IconDashboard,
 		},
 		{
-			title: "Lifecycle",
-			url: "#",
-			icon: IconListDetails,
-		},
-		{
-			title: "Analytics",
-			url: "#",
-			icon: IconChartBar,
-		},
-		{
-			title: "Projects",
-			url: "#",
-			icon: IconFolder,
-		},
-		{
-			title: "Team",
-			url: "#",
+			title: "User",
+			url: "/user",
+			role: ["ADMIN"],
 			icon: IconUsers,
+		},
+		{
+			title: "Role",
+			url: "/role",
+			role: ["ADMIN"],
+			icon: IconUserStar,
 		},
 	],
 	navClouds: [
@@ -137,8 +130,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 					<SidebarMenuItem>
 						<SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
 							<a href="#">
-								<IconInnerShadowTop className="!size-5" />
-								<span className="text-base font-semibold">Acme Inc.</span>
+								<IconMoneybag className="!size-5" />
+								<span className="text-base font-semibold">MoneysCorner.</span>
 							</a>
 						</SidebarMenuButton>
 					</SidebarMenuItem>
@@ -146,7 +139,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			</SidebarHeader>
 			<SidebarContent>
 				<NavMain items={data.navMain} />
-				<NavDocuments items={data.documents} />
+				{/* <NavDocuments items={data.documents} /> */}
 				<NavSecondary items={data.navSecondary} className="mt-auto" />
 			</SidebarContent>
 			<SidebarFooter>

@@ -17,7 +17,7 @@ const useAuthStoreBase = create<AuthStoreType>((set) => ({
 	isAuthenticated: false,
 	isLoading: true,
 	login: (user) => {
-		localStorage.setItem("token", user.token);
+		// localStorage.setItem("token", user.token);
 		set(
 			produce<AuthStoreType>((state) => {
 				state.isAuthenticated = true;

@@ -7,11 +7,20 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { User } from "@/lib/types";
 import useAuthStore from "@/store/useAuthStore";
+import { logout } from "@/lib/actions";
+import { useRouter } from "next/navigation";
 
 export function NavUser({ user }: { user: User | null }) {
 	const { isMobile } = useSidebar();
+	const router = useRouter();
 
-	const logout = useAuthStore.useLogout();
+	const zusLogout = useAuthStore.useLogout();
+
+	const handleLogout = async () => {
+		zusLogout();
+		await logout();
+		router.push("/dashboard");
+	};
 
 	return (
 		<SidebarMenu>
@@ -59,7 +68,7 @@ export function NavUser({ user }: { user: User | null }) {
 							</DropdownMenuItem>
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem onClick={logout}>
+						<DropdownMenuItem onClick={handleLogout}>
 							<IconLogout />
 							Log out
 						</DropdownMenuItem>

@@ -50,13 +50,13 @@ export function LoginForm() {
 
 			form.reset();
 		} else {
-			localStorage.setItem("token", res.token!);
+			// localStorage.setItem("token", res.token!);
 
 			login({
 				id: res.user?.id!,
 				email: res.user?.email!,
 				role: res.user?.role.role!,
-				token: res.token!,
+				// token: res.token!,
 			});
 
 			setIsLoading(false);
