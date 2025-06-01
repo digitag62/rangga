@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { IconCamera, IconDashboard, IconDatabase, IconFileAi, IconFileDescription, IconFileWord, IconHelp, IconMoneybag, IconReport, IconSearch, IconSettings, IconUsers, IconUserStar } from "@tabler/icons-react";
+import { IconCamera, IconCategory, IconDashboard, IconDatabase, IconFileAi, IconFileDescription, IconFileWord, IconFolders, IconHelp, IconMoneybag, IconReport, IconSearch, IconSettings, IconUsers, IconUserStar } from "@tabler/icons-react";
 
 // import { NavDocuments } from "@/components/nav-documents";
 import { NavMain } from "@/components/nav-main";
@@ -35,6 +35,24 @@ let data = {
 			url: "/role",
 			role: ["ADMIN"],
 			icon: IconUserStar,
+		},
+		{
+			title: "Book",
+			url: "/book",
+			role: ["ADMIN", "USER"],
+			icon: IconFolders,
+		},
+		{
+			title: "Category",
+			url: "/cat",
+			role: ["ADMIN", "USER"],
+			icon: IconCategory,
+		},
+		{
+			title: "Ledger",
+			url: "/ledger",
+			role: ["ADMIN", "USER"],
+			icon: IconReport,
 		},
 	],
 	navClouds: [
