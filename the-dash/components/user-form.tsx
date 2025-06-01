@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { toast } from "sonner";
-import { RoleProps, UserWithRoleType } from "@/lib/types";
+import { RoleProps, User, UserWithRoleType } from "@/lib/types";
 import { updateUser } from "@/lib/actions";
 
 const formSchema = z.object({
@@ -21,7 +21,7 @@ const formSchema = z.object({
 	isActive: z.string(),
 });
 
-export const UserForm = ({ data, roles, isOpen, setIsOpen }: { data: UserWithRoleType | null; roles: RoleProps[]; isOpen: boolean; setIsOpen: React.Dispatch<React.SetStateAction<boolean>> }) => {
+export const UserForm = ({ data, roles, user, isOpen, setIsOpen }: { data: UserWithRoleType | null; roles: RoleProps[]; user: User | null; isOpen: boolean; setIsOpen: React.Dispatch<React.SetStateAction<boolean>> }) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const isMobile = useIsMobile();
 
@@ -54,7 +54,7 @@ export const UserForm = ({ data, roles, isOpen, setIsOpen }: { data: UserWithRol
 		const toastLoad = toast.loading("Loading..");
 
 		if (data) {
-			const res = await updateUser(values, data.id);
+			const res = await updateUser(values, data.id, user?.email!);
 
 			if (!res.success) {
 				setIsLoading(false);

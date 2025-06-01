@@ -1,6 +1,6 @@
 "use client";
 
-import { UserWithRoleType } from "@/lib/types";
+import { User, UserWithRoleType } from "@/lib/types";
 import { ColumnDef } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
@@ -10,11 +10,11 @@ import { Badge } from "@/components/ui/badge";
 import { MoreHorizontal } from "lucide-react";
 import { DataTableColumnHeader } from "@/components/ui/datatable-column-header";
 import { FormEvent, useState } from "react";
-import { deleteRole } from "@/lib/actions";
+import { deleteUser } from "@/lib/actions";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
-export const userColumns = ({ setIsOpen, setSelected }: { setIsOpen: (val: boolean) => void; setSelected: (role: UserWithRoleType | null) => void }): ColumnDef<UserWithRoleType>[] => [
+export const userColumns = ({ user, setIsOpen, setSelected }: { user: User | null; setIsOpen: (val: boolean) => void; setSelected: (role: UserWithRoleType | null) => void }): ColumnDef<UserWithRoleType>[] => [
 	{
 		accessorKey: "email",
 		cell: ({ row }) => {
@@ -55,7 +55,7 @@ export const userColumns = ({ setIsOpen, setSelected }: { setIsOpen: (val: boole
 
 			const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
 				e.preventDefault();
-				const res = await deleteRole(data.id);
+				const res = await deleteUser(data.id, user?.email!);
 
 				setLoad(true);
 				const toastLoad = toast.loading("Please wait a sec.");
@@ -64,7 +64,7 @@ export const userColumns = ({ setIsOpen, setSelected }: { setIsOpen: (val: boole
 					setLoad(false);
 					setOpen(false);
 					toast.dismiss(toastLoad);
-					toast.error("Delete failed! Please try again.");
+					toast.error(`Delete failed! ${res.message}`);
 				} else {
 					setLoad(false);
 					setOpen(false);

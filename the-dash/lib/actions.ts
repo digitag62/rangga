@@ -283,8 +283,8 @@ export const createUser = async (payload: AuthPayload) => {
 	}
 };
 
-export const updateUser = async (payload: UserPayload, id: string) => {
-	const sessionCheck = await checkSession("admin-only");
+export const updateUser = async (payload: UserPayload, id: string, emailUser: string) => {
+	const sessionCheck = await checkSession("strict", emailUser);
 	if (!sessionCheck.success) return { success: false, message: sessionCheck.message };
 
 	const { email, role, isActive } = payload;
@@ -310,6 +310,32 @@ export const updateUser = async (payload: UserPayload, id: string) => {
 					return { success: false, message: `${payload.email} already exists. User must be unique.` };
 				case "P2003": // Foreign Key Constraint Failed (You tried to reference or delete a record that's linked to another via a foreign key.)
 					return { success: false, message: `Cannot delete user. It's assigned to something.` };
+				case "P2016": // Query interpretation error (Can happen if your query tries to reference something that doesn’t exist.)
+					return { success: false, message: `Reference not found` };
+				case "P2025":
+					return { success: false, message: "Record not found" };
+				default:
+					return { success: false, message: `Known request error: ${(error as any).message}` };
+			}
+		}
+
+		return { success: false, message: "An unexpected error occurred." };
+	}
+};
+
+export const deleteUser = async (id: string, email: string) => {
+	const sessionCheck = await checkSession("strict", email);
+	if (!sessionCheck.success) return { success: false, message: sessionCheck.message };
+
+	try {
+		await prismadb.user.delete({ where: { id } });
+		revalidatePath("/user");
+		return { success: true, message: "Delete user: Success" };
+	} catch (error) {
+		if (typeof error === "object" && error !== null && "code" in error && typeof error.code === "string") {
+			switch (error.code) {
+				case "P2003": // Foreign Key Constraint Failed (You tried to reference or delete a record that's linked to another via a foreign key.)
+					return { success: false, message: `Cannot delete user: It is associated with one or more users.` };
 				case "P2016": // Query interpretation error (Can happen if your query tries to reference something that doesn’t exist.)
 					return { success: false, message: `Reference not found` };
 				case "P2025":
