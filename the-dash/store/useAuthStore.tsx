@@ -1,13 +1,13 @@
-import { User } from "@/lib/types";
+import { UserProps } from "@/lib/user/types";
 import { createSelectorHooks } from "auto-zustand-selectors-hook";
 import { produce } from "immer";
 import { create } from "zustand";
 
 type AuthStoreType = {
-	user: User | null;
+	user: UserProps | null;
 	isAuthenticated: boolean;
 	isLoading: boolean;
-	login: (user: User) => void;
+	login: (user: UserProps) => void;
 	logout: () => void;
 	stopLoading: () => void;
 };

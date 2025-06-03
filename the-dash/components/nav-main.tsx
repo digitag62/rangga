@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import useAuthStore from "@/store/useAuthStore";
 
 export function NavMain({
 	items,
@@ -13,10 +14,12 @@ export function NavMain({
 	items: {
 		title: string;
 		url: string;
+		role: string[];
 		icon?: Icon;
 	}[];
 }) {
 	const pathname = usePathname();
+	const user = useAuthStore.useUser();
 
 	return (
 		<SidebarGroup>
@@ -34,20 +37,22 @@ export function NavMain({
 					</SidebarMenuItem>
 				</SidebarMenu>
 				<SidebarMenu>
-					{items.map((item) => {
-						const isActive = pathname === item.url;
+					{items
+						.filter((item) => item.role.includes(user?.role!))
+						.map((item) => {
+							const isActive = pathname === item.url;
 
-						return (
-							<SidebarMenuItem key={item.title}>
-								<SidebarMenuButton asChild tooltip={item.title} className={isActive ? "bg-muted text-primary font-medium" : "text-muted-foreground"}>
-									<Link href={item.url}>
-										{item.icon && <item.icon />}
-										<span>{item.title}</span>
-									</Link>
-								</SidebarMenuButton>
-							</SidebarMenuItem>
-						);
-					})}
+							return (
+								<SidebarMenuItem key={item.title}>
+									<SidebarMenuButton asChild tooltip={item.title} className={isActive ? "bg-muted text-primary font-medium" : "text-muted-foreground"}>
+										<Link href={item.url}>
+											{item.icon && <item.icon />}
+											<span>{item.title}</span>
+										</Link>
+									</SidebarMenuButton>
+								</SidebarMenuItem>
+							);
+						})}
 				</SidebarMenu>
 			</SidebarGroupContent>
 		</SidebarGroup>

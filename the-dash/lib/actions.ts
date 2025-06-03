@@ -6,7 +6,7 @@ import { prismadb } from "@/lib/prismadb";
 import { createJWT, verifyToken } from "@/lib/session";
 import { cookies } from "next/headers";
 
-export const checkSession = async (type: "get" | "strict" | "admin-only", email?: string) => {
+export const checkSession = async (type: "get" | "strict" | "admin-only" | "author-only", props?: string) => {
 	const token = (await cookies()).get("token")?.value;
 	if (!token) return { success: false, message: "You are not authorized to call this action.", data: null };
 
@@ -16,16 +16,17 @@ export const checkSession = async (type: "get" | "strict" | "admin-only", email?
 	switch (type) {
 		case "strict":
 			if (session?.data?.role !== "ADMIN") return { success: false, message: "You are not authorized to call this action.", data: null };
-			if (session.data?.email === email) return { success: false, message: "You are trying to altering yourself.", data: null };
+			if (session.data?.email === props) return { success: false, message: "You are trying to altering yourself.", data: null };
 
 			return { success: true, message: "User authorized to continue", data: session.data };
 		case "admin-only":
 			if (session?.data?.role !== "ADMIN") return { success: false, message: "You are not authorized to call this action.", data: null };
 			return { success: true, message: "User authorized to continue", data: session.data };
-
+		case "author-only":
+			if (session?.data?.id !== props) return { success: false, message: "You are not authorized to call this action.", data: null };
+			return { success: true, message: "User authorized to continue", data: session.data };
 		case "get":
 			return { success: true, message: "User authorized to continue", data: session.data };
-
 		default:
 			return { success: false, message: "Something went wrong at session check.", data: null };
 	}
@@ -87,6 +88,14 @@ export const authenticate = async (values: AuthPayload) => {
 
 export const logout = async () => {
 	(await cookies()).delete("token");
+};
+
+export const getCurrentSession = async () => {
+	const token = (await cookies()).get("token")?.value;
+	if (!token) return { success: false, message: "You are not authenticated! Please login first.", data: null };
+
+	const resToken = await verifyToken(token);
+	return { success: true, message: "Get Token: Success.", data: resToken };
 };
 
 export const getCurrentUser = async (token: string) => {
