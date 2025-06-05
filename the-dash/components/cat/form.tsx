@@ -43,10 +43,10 @@ export const CatForm = ({ data, books, isOpen, setIsOpen }: { data: CatProps | n
 	useEffect(() => {
 		if (isOpen) {
 			form.reset({
-				bookId: data?.book.id ?? "",
+				bookId: data?.book?.id ?? "",
 				type: data?.type ?? "EXP",
 				cat: data?.cat ?? "",
-				max: parseFloat(data?.max.toString()!) ?? "",
+				max: parseFloat(data?.max?.toString()!) || 0,
 				isActive: data?.isActive?.toString() ?? "true",
 			});
 		}
@@ -61,7 +61,7 @@ export const CatForm = ({ data, books, isOpen, setIsOpen }: { data: CatProps | n
 		setIsLoading(true);
 		const toastLoad = toast.loading("Loading...");
 
-		const res = data ? await updateCat(values, data.id, data.userId) : await createCat(values);
+		const res = data ? await updateCat(values, data.id, data.userId!) : await createCat(values);
 
 		if (!res.success) {
 			setIsLoading(false);

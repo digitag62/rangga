@@ -1,11 +1,11 @@
 export type CatProps = {
+	id: string;
 	cat: string;
 	type: "EXP" | "ERN" | "SAV" | "TRF";
-	id: string;
-	max: number;
-	userId: string;
-	isActive: boolean;
-	book: {
+	max?: number;
+	userId?: string;
+	isActive?: boolean;
+	book?: {
 		id: string;
 		name: string;
 	};
