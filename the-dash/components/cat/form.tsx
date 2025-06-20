@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { createCat, updateCat } from "@/lib/cat/actions";
 import { CatProps } from "@/lib/cat/types";
 import { BookProps } from "@/lib/book/types";
+import { redirect } from "next/navigation";
 
 const formSchema = z.object({
 	bookId: z.string().min(1, { message: "This field has to be filled." }),
@@ -57,6 +58,11 @@ export const CatForm = ({ data, books, isOpen, setIsOpen }: { data: CatProps | n
 		form.reset();
 	};
 
+	const handleBookChange = (val: string) => {
+		const url = "/book";
+		if (val === "new") redirect(url);
+	};
+
 	const onSubmit = async (values: z.infer<typeof formSchema>) => {
 		setIsLoading(true);
 		const toastLoad = toast.loading("Loading...");
@@ -90,18 +96,26 @@ export const CatForm = ({ data, books, isOpen, setIsOpen }: { data: CatProps | n
 						</DrawerHeader>
 						<div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
 							<FormField
-								control={form.control}
 								name="bookId"
+								control={form.control}
 								render={({ field }) => (
 									<FormItem>
 										<FormLabel>Book</FormLabel>
-										<Select onValueChange={field.onChange} defaultValue={field.value}>
+										<Select
+											onValueChange={(value) => {
+												field.onChange(value);
+												handleBookChange(value);
+											}}
+											defaultValue={field.value}
+										>
 											<FormControl className="w-full">
 												<SelectTrigger>
 													<SelectValue placeholder="Select a Book" />
 												</SelectTrigger>
 											</FormControl>
 											<SelectContent>
+												<SelectItem value="new">New Book</SelectItem>
+
 												{books &&
 													books.map((book) => (
 														<SelectItem value={book.id} key={book.id}>
@@ -115,8 +129,8 @@ export const CatForm = ({ data, books, isOpen, setIsOpen }: { data: CatProps | n
 								)}
 							/>
 							<FormField
-								control={form.control}
 								name="type"
+								control={form.control}
 								render={({ field }) => (
 									<FormItem>
 										<FormLabel>Type</FormLabel>
@@ -138,8 +152,8 @@ export const CatForm = ({ data, books, isOpen, setIsOpen }: { data: CatProps | n
 								)}
 							/>
 							<FormField
-								control={form.control}
 								name="cat"
+								control={form.control}
 								render={({ field }) => (
 									<FormItem>
 										<FormLabel>Category</FormLabel>
@@ -151,8 +165,8 @@ export const CatForm = ({ data, books, isOpen, setIsOpen }: { data: CatProps | n
 								)}
 							/>
 							<FormField
-								control={form.control}
 								name="max"
+								control={form.control}
 								render={({ field }) => (
 									<FormItem>
 										<FormLabel>Max Amount</FormLabel>
@@ -163,10 +177,9 @@ export const CatForm = ({ data, books, isOpen, setIsOpen }: { data: CatProps | n
 									</FormItem>
 								)}
 							/>
-
 							<FormField
-								control={form.control}
 								name="isActive"
+								control={form.control}
 								render={({ field }) => (
 									<FormItem>
 										<FormLabel>Status</FormLabel>

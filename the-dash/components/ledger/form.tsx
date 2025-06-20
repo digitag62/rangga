@@ -65,6 +65,11 @@ export const LedgerForm = ({ data, books, cats, isOpen, setIsOpen }: { data: Led
 		if (val === "new") redirect(url);
 	};
 
+	const handleBookChange = (val: string) => {
+		const url = "/book";
+		if (val === "new") redirect(url);
+	};
+
 	const onSubmit = async (values: z.infer<typeof formSchema>) => {
 		setIsLoading(true);
 		const toastLoad = toast.loading("Loading...");
@@ -103,13 +108,21 @@ export const LedgerForm = ({ data, books, cats, isOpen, setIsOpen }: { data: Led
 								render={({ field }) => (
 									<FormItem>
 										<FormLabel>Book</FormLabel>
-										<Select onValueChange={field.onChange} defaultValue={field.value}>
+										<Select
+											onValueChange={(value) => {
+												field.onChange(value);
+												handleBookChange(value);
+											}}
+											defaultValue={field.value}
+										>
 											<FormControl className="w-full">
 												<SelectTrigger>
 													<SelectValue placeholder="Select a Book" />
 												</SelectTrigger>
 											</FormControl>
 											<SelectContent>
+												<SelectItem value="new">New Book</SelectItem>
+
 												{books &&
 													books.map((book) => (
 														<SelectItem value={book.id} key={book.id}>
