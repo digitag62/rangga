@@ -41,7 +41,7 @@ export const createRole = async (payload: RolePayload) => {
 			data: {
 				role: role,
 				isActive: status,
-				createdBy: sessionCheck.data?.email!,
+				createdBy: sessionCheck.data?.email ?? "",
 			},
 		});
 
@@ -64,7 +64,7 @@ export const updateRole = async (payload: RolePayload, id: string) => {
 			data: {
 				role: role,
 				isActive: status,
-				updatedBy: sessionCheck.data?.email!,
+				updatedBy: sessionCheck.data?.email ?? "",
 			},
 			where: { id },
 		});

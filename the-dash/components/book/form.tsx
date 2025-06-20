@@ -51,7 +51,7 @@ export const BookForm = ({ data, isOpen, setIsOpen }: { data: BookProps | null; 
 		setIsLoading(true);
 		const toastLoad = toast.loading("Loading...");
 
-		const res = data ? await updateBook(values, data.id, data.userId) : await createBook(values);
+		const res = data ? await updateBook(values, data.id, data.userId ?? "") : await createBook(values);
 
 		if (!res.success) {
 			setIsLoading(false);

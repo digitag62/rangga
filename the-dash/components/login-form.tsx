@@ -53,9 +53,9 @@ export function LoginForm() {
 			// localStorage.setItem("token", res.token!);
 
 			login({
-				id: res.user?.id!,
-				email: res.user?.email!,
-				role: res.user?.role.role!,
+				id: res.user?.id ?? "",
+				email: res.user?.email ?? "",
+				role: res.user?.role.role ?? "",
 				// token: res.token!,
 			});
 

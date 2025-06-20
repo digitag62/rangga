@@ -119,7 +119,7 @@ export const getCurrentUser = async (token: string) => {
 		});
 		if (!user) return { success: false, message: "Get User: Failed", data: null };
 
-		const data = { id: user?.id!, email: user?.email!, role: user?.role.role! };
+		const data = { id: user?.id ?? "", email: user?.email ?? "", role: user?.role.role ?? "" };
 		// console.log("getCurrentUser: ", data);
 
 		return { success: true, message: "Get User: Success", data };
@@ -152,7 +152,7 @@ export const createUser = async (payload: AuthPayload) => {
 			data: {
 				email: email,
 				pwd: hashedPass,
-				roleId: userRoleId?.data?.id!,
+				roleId: userRoleId?.data?.id ?? "",
 				createdBy: email,
 			},
 		});
@@ -170,7 +170,7 @@ export const createUser = async (payload: AuthPayload) => {
 				case "P2025":
 					return { success: false, message: "Record not found" };
 				default:
-					return { success: false, message: `Known request error: ${(error as any).message}` };
+					return { success: false, message: `Known request error` };
 			}
 		}
 

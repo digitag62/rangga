@@ -28,9 +28,9 @@ export const createLedger = async (payload: LedgerPayload) => {
 				remarks: payload.remarks,
 				catId: payload.catId,
 				bookId: payload.bookId,
-				userId: sessionCheck.data?.id!,
+				userId: sessionCheck.data?.id ?? "",
 				isActive: payload.isActive === "true",
-				createdBy: sessionCheck.data?.email!,
+				createdBy: sessionCheck.data?.email ?? "",
 			},
 		});
 
@@ -53,9 +53,9 @@ export const updateLedger = async (payload: LedgerPayload, ledgerId: string, use
 				remarks: payload.remarks,
 				catId: payload.catId,
 				bookId: payload.bookId,
-				userId: sessionCheck.data?.id!,
+				userId: sessionCheck.data?.id ?? "",
 				isActive: payload.isActive === "true",
-				updatedBy: sessionCheck.data?.email!,
+				updatedBy: sessionCheck.data?.email ?? "",
 			},
 			where: { id: ledgerId },
 		});

@@ -5,12 +5,12 @@ import * as React from "react";
 
 import useAuthStore from "@/store/useAuthStore";
 
-import { User } from "@/lib/types";
+import { UserWithRoleProps } from "@/lib/user/types";
 import { getCurrentUser } from "@/lib/actions";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export interface WithAuthProps {
-	user: User;
+	user: UserWithRoleProps;
 }
 
 const HOME_ROUTE = "/dashboard";
@@ -70,10 +70,10 @@ export default function withAuth<T extends WithAuthProps = WithAuthProps>(Compon
 					const res = await getCurrentUser(token);
 
 					login({
-						id: res.data?.id!,
-						role: res.data?.role.role!,
-						email: res.data?.email!,
-						token: token + "",
+						id: res.data?.id ?? "",
+						role: res.data?.role ?? "",
+						email: res.data?.email ?? "",
+						// token: token + "",
 					});
 				} catch (err) {
 					localStorage.removeItem("token");

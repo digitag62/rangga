@@ -38,7 +38,7 @@ export function NavMain({
 				</SidebarMenu>
 				<SidebarMenu>
 					{items
-						.filter((item) => item.role.includes(user?.role!))
+						.filter((item) => item.role.includes(user?.role ?? ""))
 						.map((item) => {
 							const isActive = pathname === item.url;
 

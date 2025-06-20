@@ -24,9 +24,9 @@ export const createBook = async (payload: BookPayload) => {
 		await prismadb.book.create({
 			data: {
 				name: payload.name,
-				userId: sessionCheck.data?.id!,
+				userId: sessionCheck.data?.id ?? "",
 				isActive: payload.isActive === "true",
-				createdBy: sessionCheck.data?.email!,
+				createdBy: sessionCheck.data?.email ?? "",
 			},
 		});
 
@@ -46,7 +46,7 @@ export const updateBook = async (payload: BookPayload, bookId: string, userId: s
 			data: {
 				name: payload.name,
 				isActive: payload.isActive === "true",
-				updatedBy: sessionCheck.data?.email!,
+				updatedBy: sessionCheck.data?.email ?? "",
 			},
 			where: { id: bookId },
 		});

@@ -46,7 +46,7 @@ export const LedgerForm = ({ data, books, cats, isOpen, setIsOpen }: { data: Led
 		if (isOpen) {
 			form.reset({
 				type: data?.type ?? "EXP",
-				amount: parseFloat(data?.amount.toString()!) || 0,
+				amount: parseFloat(data?.amount.toString() ?? "0") || 0,
 				remarks: data?.remarks ?? "",
 				catId: data?.cat.id ?? "",
 				bookId: data?.book.id ?? "",

@@ -5,12 +5,12 @@ import { IconCreditCard, IconDotsVertical, IconLogout, IconNotification, IconUse
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
-import { User } from "@/lib/types";
 import useAuthStore from "@/store/useAuthStore";
 import { logout } from "@/lib/actions";
 import { useRouter } from "next/navigation";
+import { UserProps } from "@/lib/user/types";
 
-export function NavUser({ user }: { user: User | null }) {
+export function NavUser({ user }: { user: UserProps | null }) {
 	const { isMobile } = useSidebar();
 	const router = useRouter();
 

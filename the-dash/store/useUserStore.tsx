@@ -1,9 +1,9 @@
 import { getAllUsers } from "@/lib/actions";
-import { UserWithRoleType } from "@/lib/types";
+import { UserWithRoleProps } from "@/lib/user/types";
 import { create } from "zustand";
 
 type UserStore = {
-	users: UserWithRoleType[] | null;
+	users: UserWithRoleProps[] | null;
 	isLoading: boolean;
 	lastFetched: number | null; // Unix timestamp (ms)
 	fetchUsers: () => void;

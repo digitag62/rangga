@@ -4,6 +4,7 @@ export const hashPassword = async (password: string) => await bcrypt.hash(passwo
 export const comparePasswordHash = async (pwd: string, hashedPwd: string) => await bcrypt.compare(pwd, hashedPwd);
 
 // Error handler
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const handlePrismaError = (error: any, label: string) => {
 	if (typeof error === "object" && error !== null && "code" in error && typeof error.code === "string") {
 		switch (error.code) {

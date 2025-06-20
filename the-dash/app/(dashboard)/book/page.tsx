@@ -28,7 +28,7 @@ const Content = async () => {
 			userId: true,
 			isActive: true,
 		},
-		where: { userId: session?.data?.id! },
+		where: { userId: session?.data?.id ?? "" },
 	});
 
 	return <BookTableClient data={data} />;

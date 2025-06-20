@@ -6,7 +6,7 @@ import { DataTable } from "@/components/ui/datatable";
 import { userColumns } from "@/components/user/user-columns";
 import { UserForm } from "@/components/user/user-form";
 
-import { RoleProps } from "@/lib/types";
+import { RoleProps } from "@/lib/role/types";
 import { UserWithRoleProps } from "@/lib/user/types";
 
 export const UserTableClient = ({ data, roles }: { data: UserWithRoleProps[]; roles: RoleProps[] }) => {

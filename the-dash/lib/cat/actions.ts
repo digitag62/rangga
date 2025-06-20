@@ -27,9 +27,9 @@ export const createCat = async (payload: CatPayload) => {
 				max: payload.max,
 				type: payload.type,
 				bookId: payload.bookId,
-				userId: sessionCheck.data?.id!,
+				userId: sessionCheck.data?.id ?? "",
 				isActive: payload.isActive === "true",
-				createdBy: sessionCheck.data?.email!,
+				createdBy: sessionCheck.data?.email ?? "",
 			},
 		});
 
@@ -52,7 +52,7 @@ export const updateCat = async (payload: CatPayload, catId: string, userId: stri
 				type: payload.type,
 				bookId: payload.bookId,
 				isActive: payload.isActive === "true",
-				updatedBy: sessionCheck.data?.email!,
+				updatedBy: sessionCheck.data?.email ?? "",
 			},
 			where: { id: catId },
 		});

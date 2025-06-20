@@ -20,7 +20,7 @@ export const updateUser = async (payload: UserPayload, id: string) => {
 				email: email,
 				roleId: roleId,
 				isActive: status,
-				updatedBy: sessionCheck.data?.email!,
+				updatedBy: sessionCheck.data?.email ?? "",
 			},
 			where: { id },
 		});

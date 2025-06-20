@@ -32,11 +32,11 @@ const Content = async () => {
 			userId: true,
 			isActive: true,
 		},
-		where: { userId: session?.data?.id! },
+		where: { userId: session?.data?.id ?? "" },
 	});
 	const books = await prismadb.book.findMany({
 		select: { id: true, name: true },
-		where: { userId: session?.data?.id!, isActive: true },
+		where: { userId: session?.data?.id ?? "", isActive: true },
 	});
 
 	return <CatTableClient data={data} books={books} />;

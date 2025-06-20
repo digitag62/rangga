@@ -10,7 +10,7 @@ import { NavUser } from "@/components/nav-user";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import useAuthStore from "@/store/useAuthStore";
 
-let data = {
+const data = {
 	user: {
 		id: "shadcn",
 		email: "m@example.com",

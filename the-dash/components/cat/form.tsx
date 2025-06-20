@@ -47,7 +47,7 @@ export const CatForm = ({ data, books, isOpen, setIsOpen }: { data: CatProps | n
 				bookId: data?.book?.id ?? "",
 				type: data?.type ?? "EXP",
 				cat: data?.cat ?? "",
-				max: parseFloat(data?.max?.toString()!) || 0,
+				max: parseFloat(data?.max?.toString() ?? "0") || 0,
 				isActive: data?.isActive?.toString() ?? "true",
 			});
 		}
